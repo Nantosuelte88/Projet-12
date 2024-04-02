@@ -1,8 +1,9 @@
 from sqlalchemy import Column, Integer, String, Date, Float, ForeignKey
 from sqlalchemy.orm import relationship, declarative_base
-from collaboration import Collaborator
+from collaboration import Collaborator, Department
+from collaboration import Base as CollaborationBase
 
-Base = declarative_base()
+Base = CollaborationBase
 
 
 class Client(Base):
@@ -17,7 +18,7 @@ class Client(Base):
     last_contact_date = Column(Date)
     commercial_id = Column(Integer, ForeignKey('collaborators.id'))
 
-    contact_person = relationship("Collaborator")
+    contact_commercial = relationship("Collaborator")
 
 
 class Contract(Base):
@@ -38,7 +39,7 @@ class Event(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(String(100))
-    contract_id = Column(Integer, ForeignKey('contacts.id'))
+    contract_id = Column(Integer, ForeignKey('contracts.id'))
     client_contact = Column(String(100))
     date_start = Column(Date)
     date_end = Column(Date)
