@@ -11,10 +11,10 @@ Session = sessionmaker(bind=engine)
 session = Session()
 
 # Définissez les informations pour créer le nouvel utilisateur
-full_name = "Emma Caréna"
-email = "emma.carena@example.com"
-password = "password456"
-department_id = 3
+full_name = "Basile Hic"
+email = "basile.hic@epic_events.com"
+password = "password789"
+department_id = 2
 
 # Générez un sel (salt) aléatoire pour le hachage bcrypt
 salt = bcrypt.gensalt()

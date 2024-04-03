@@ -13,12 +13,14 @@ class Client(Base):
     full_name = Column(String(100))
     email = Column(String(50))
     phone_number = Column(String(10))
-    company_name = Column(String(100), nullable=True)
     creation_date = Column(Date)
     last_contact_date = Column(Date)
     commercial_id = Column(Integer, ForeignKey('collaborators.id'))
+    company_name = Column(String(100), nullable=True)
+    company_id = Column(Integer, ForeignKey('companies.id'), nullable=True)
 
     contact_commercial = relationship("Collaborator")
+    company = relationship("Company")
 
 
 class Contract(Base):
@@ -49,3 +51,14 @@ class Event(Base):
 
     contract = relationship("Contract", backref="events")
     support = relationship("Collaborator", backref="events")
+
+
+class Company(Base):
+    __tablename__ = "companies"
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String(100))
+    phone_number = Column(String(20), nullable=True)
+    address = Column(String(200), nullable=True)
+    industry = Column(String(100), nullable=True)
+    

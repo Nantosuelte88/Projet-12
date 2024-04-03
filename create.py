@@ -1,3 +1,6 @@
+import sys
+sys.path.append('../')
+
 from connect_database import create_db_connection
 from models.clients import Base
 from models.collaboration import Base as CollaborationModelsBase
