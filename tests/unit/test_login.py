@@ -1,12 +1,12 @@
 import pytest
-import jwt
 import os
 from sqlalchemy.orm import sessionmaker
 
 from connect_database import create_db_connection
-from auth_permissions import authenticate
+from controllers.auth_permissions import authenticate, authorize
 
 password_test = os.environ.get('TEST_PASSWORD')
+
 
 @pytest.fixture(scope='session')
 def db_session():
@@ -44,3 +44,13 @@ def test_good_login(db_session, capfd):
     authenticate('emma.carena@example.com', password_test)
     captured = capfd.readouterr()
     assert 'Authentification réussie' in captured.out
+
+
+def test_autorize(db_session, capfd):
+    """
+    Test sur l'autorisation, ici commercial
+    """
+    token = authenticate('emma.carena@example.com', password_test)
+    authorize(token)
+    captured = capfd.readouterr()
+    assert 'Departement Commercial' in captured.out

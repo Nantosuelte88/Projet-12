@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Date, Float, ForeignKey
+from sqlalchemy import Column, Integer, String, Date, Float, ForeignKey, Boolean
 from sqlalchemy.orm import relationship, declarative_base
 from models.collaboration import Collaborator, Department
 from models.collaboration import Base as CollaborationBase
@@ -31,7 +31,7 @@ class Contract(Base):
     total_amount = Column(Float)
     remaining_amount = Column(Float)
     creation_date = Column(Date)
-    status = Column(String(50))
+    status = Column(Boolean, default=False)
 
     client = relationship("Client", backref="contracts")
 
