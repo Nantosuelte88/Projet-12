@@ -1,9 +1,11 @@
 from controllers.auth_permissions import authenticate, authorize
 from views.login import login
 from models.clients import Client, Contract, Event
+from models.collaboration import Collaborator, Department
 from connect_database import create_db_connection
 from sqlalchemy.orm import sessionmaker
-
+from tabulate import tabulate
+from controllers.get_object import get_client_by_id, get_collaborator_by_id, get_contract_by_id
 
 engine = create_db_connection()
 Session = sessionmaker(bind=engine)
@@ -16,23 +18,33 @@ def view_all_clients(token):
         if authorized:
             # Récupérer tous les clients de la base de données
             clients = session.query(Client).all()
-            
-            # Afficher les informations des clients
+
+            # Préparer les données pour le tableau
+            table_data = []
             for client in clients:
-                # if company_id:
-                #     company = campany_id.name
-                # afficher le nom du commercial plutot que son id
-                print(f"Nom: {client.full_name}, \
-                      Email: {client.email}, \
-                      Téléphone: {client.phone_number}, \
-                      Nome de l'entreprise: {client.company}, \
-                      Date de création: {client.creation_date}, \
-                      Dernier contact: {client.last_contact_date}, \
-                      Contact commercial chez Epic Event: {client.commercial_id}")
+                collaborator = get_collaborator_by_id(client.commercial_id)
+                row = [
+                    client.id,
+                    client.full_name,
+                    client.email,
+                    client.phone_number,
+                    client.company,
+                    client.creation_date,
+                    client.last_contact_date,
+                    collaborator.full_name if collaborator else "Commercial inconnu"
+                ]
+                table_data.append(row)
+
+            # Afficher le tableau
+            headers = [" ", "Nom", "Email", "Téléphone", "Nom de l'entreprise",
+                       "Date de création", "Dernier contact", "Contact commercial chez Epic Event"]
+            print(tabulate(table_data, headers, tablefmt="grid"))
+
         else:
             print("Accès non autorisé")
     else:
         print("Utilisateur non connecté")
+
 
 def view_all_contracts(token):
     if token:
@@ -40,20 +52,31 @@ def view_all_contracts(token):
         if authorized:
             # Récupérer tous les contrats de la base de données
             contracts = session.query(Contract).all()
-            
-            # Afficher les informations des clients
+
+            # Préparer les données pour le tableau
+            table_data = []
+            # Afficher les informations des contrats
             for contract in contracts:
-                # faire 0 Non et 1 Oui pour le statut, verifier reste à payer (compta?)
-                # recuperer infos du client
-                print(f"Client: {contract.client_id}, \
-                      Montant Total: {contract.total_amount}, \
-                      Montant restant à payer: {contract.remaining_amount}, \
-                      Date de création du contrat: {contract.creation_date}, \
-                      Contrat signé: {contract.status}")
+                client = get_client_by_id(contract.client_id)
+                row = [
+                    contract.id,
+                    client.full_name if client else "Client inconnu",
+                    contract.total_amount,
+                    contract.remaining_amount,
+                    contract.creation_date,
+                    contract.status
+                ]
+                table_data.append(row)
+
+                headers = [" ", "Client", "Montant total",
+                           "Montant restant à payer", "Date de création", "Contrat signé"]
+                print(tabulate(table_data, headers, tablefmt="grid"))
+
         else:
             print("Accès non autorisé")
     else:
         print("Utilisateur non connecté")
+
 
 def view_all_events(token):
     if token:
@@ -61,20 +84,33 @@ def view_all_events(token):
         if authorized:
             # Récupérer tous les évenements de la base de données
             events = session.query(Event).all()
-            
-            # Afficher les informations des clients
+
+            table_data = []
             for event in events:
-                print(f"Nom: {event.name}, \
-                      ID de l'évéenement: {event.id}, \
-                      Contrat ID: {event.contract_id}, \
-                      Nom du client: {event.contract_id}, \
-                      Contact du client: {event.contract_id}, \
-                      Date de début: {event.date_start}, \
-                      Date de fin: {event.date_end}, \
-                      Contact support chez Epic Event: {event.support_id}, \
-                      Lieu: {event.location}, \
-                      Nombres d'invités: {event.attendees}, \
-                      Commentaire: {event.notes}")
+                contract = get_contract_by_id(event.contract_id)
+                if contract:
+                    client = get_client_by_id(contract.client_id)
+
+                support = get_collaborator_by_id(event.support_id)
+
+                row = [
+                    event.id,
+                    event.name,
+                    event.contract_id,
+                    client.full_name if client else "Client inconnu",
+                    client.phone_number and client.email if client else "Client inconnu",
+                    event.date_start,
+                    event.date_end,
+                    support.full_name if support else "Support inconnu",
+                    event.location,
+                    event.attendees,
+                    event.notes
+                ]
+                table_data.append(row)
+
+                headers = [" ", "Nom", "Contrat id", "Nom du client", "Contact du client", "Date de début",
+                           "Date de fin", "Contact support chez Epic Event", "Lieu", "Nombres d'invités", "Commentaires"]
+                print(tabulate(table_data, headers, tablefmt="grid"))
         else:
             print("Accès non autorisé")
     else:

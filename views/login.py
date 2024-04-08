@@ -1,5 +1,3 @@
-import os
-import jwt
 import re
 import getpass
 from sqlalchemy.orm import sessionmaker
@@ -7,7 +5,6 @@ from datetime import datetime, timedelta, timezone
 from connect_database import create_db_connection
 from models.collaboration import Collaborator
 from controllers.auth_permissions import authenticate, authorize
-import bcrypt
 
 
 def is_valid_email(email):
