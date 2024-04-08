@@ -7,9 +7,7 @@ from models.collaboration import Collaborator
 import bcrypt
 
 # Définir la session SQLAlchemy
-engine = create_db_connection()
-Session = sessionmaker(bind=engine)
-session = Session()
+session = create_db_connection()
 
 secret_key = os.environ.get('SECRET_KEY')
 
@@ -49,10 +47,11 @@ def authenticate(email, password):
         print('Utilisateur inconnu')
         return None
 
-# Fonction pour l'autorisation
 
-
-def authorize(token):
+def authorize(token, department_id):
+    """
+    Fonction pour l'autorisation
+    """
     try:
         # Vérifier la validité et l'intégrité du token
         payload = jwt.decode(token, secret_key, algorithms=['HS256'])
@@ -73,20 +72,16 @@ def authorize(token):
             token = new_token
             payload = jwt.decode(token, secret_key, algorithms=['HS256'])
 
-        # Accéder à l'ID du département
-        department_id = payload['department_id']
+        # Accéder à l'ID du département du token
+        user_department_id = payload['department_id']
 
-        # trouver comment acceder à l'id de department
-        if department_id == 1:
-            print('Departement Support')
-        elif department_id == 2:
-            print('Departement Gestion')
-        elif department_id == 3:
-            print('Departement Commercial')
+        # Vérifier si l'ID du département correspond à celui souhaité
+        if department_id is None or user_department_id == department_id:
+            return True
         else:
-            print('Une erreur s\'est produite, veuillez nous excuser')
+            print("Autorisation refusée pour ce département")
+            return False
 
-        return True
     except jwt.ExpiredSignatureError:
         return False
     except jwt.InvalidTokenError:

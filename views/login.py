@@ -1,29 +1,10 @@
-import re
 import getpass
 from sqlalchemy.orm import sessionmaker
 from datetime import datetime, timedelta, timezone
 from connect_database import create_db_connection
 from models.collaboration import Collaborator
 from controllers.auth_permissions import authenticate, authorize
-
-
-def is_valid_email(email):
-    """
-    Vérifie si l'email est valide en utilisant une expression régulière
-    """
-    pattern = r'^[\w\.-]+@[\w\.-]+\.\w+$'
-    return re.match(pattern, email) is not None
-
-
-def is_valid_password(password):
-    """
-    Vérifie si le mot de passe est valide
-    """
-    # Exemple de règles de validation du mot de passe
-    if len(password) < 10:
-        return False
-
-    return True
+from utils.input_validators import is_valid_email, is_valid_password
 
 
 def login():
@@ -52,7 +33,7 @@ def login():
             token = authenticate(email, password)
 
             if token:
-                authorized = authorize(token)
+                authorized = authorize(token, None)
                 if authorized:
                     print("Accès autorisé")
                     return token

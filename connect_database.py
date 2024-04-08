@@ -1,6 +1,8 @@
 from sqlalchemy import create_engine
 from dotenv import load_dotenv
 import os
+from sqlalchemy.orm import sessionmaker
+
 
 def create_db_connection():
     """
@@ -16,8 +18,11 @@ def create_db_connection():
     db_password = os.getenv('DB_PASSWORD')
     db_name = os.getenv('DB_NAME')
 
-    db_url = f'mysql+mysqlconnector://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}'
+    db_url = f'mysql+mysqlconnector://{db_user}:{
+        db_password}@{db_host}:{db_port}/{db_name}'
 
     engine = create_engine(db_url)
+    Session = sessionmaker(bind=engine)
+    session = Session()
 
-    return engine
+    return session

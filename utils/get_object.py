@@ -1,12 +1,20 @@
+import jwt
+import os
 from models.clients import Client, Contract, Event
 from models.collaboration import Collaborator, Department
 from connect_database import create_db_connection
 from sqlalchemy.orm import sessionmaker
 
 
-engine = create_db_connection()
-Session = sessionmaker(bind=engine)
-session = Session()
+session = create_db_connection()
+
+secret_key = os.environ.get('SECRET_KEY')
+
+
+def get_id_by_token(token):
+    decoded_token = jwt.decode(token, secret_key, algorithms=['HS256'])
+    collaborator_id = decoded_token['collaborator_id']
+    return collaborator_id
 
 
 def get_collaborator_by_id(collaborator_id):
