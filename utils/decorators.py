@@ -1,4 +1,5 @@
 from controllers.auth_permissions import authorize
+from utils.get_object import get_id_by_token
 
 
 def department_permission_required(department_id):
@@ -14,3 +15,5 @@ def department_permission_required(department_id):
                 print("Utilisateur non connecté")
         return wrapper
     return decorator
+
+

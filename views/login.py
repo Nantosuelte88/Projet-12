@@ -1,4 +1,5 @@
 import getpass
+import click
 from sqlalchemy.orm import sessionmaker
 from datetime import datetime, timedelta, timezone
 from connect_database import create_db_connection

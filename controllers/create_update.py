@@ -13,6 +13,7 @@ from utils.get_object import get_id_by_token
 session = create_db_connection()
 
 
+# si commercial
 @department_permission_required(3)
 def create_new_user(token):
     
@@ -44,3 +45,4 @@ def create_new_user(token):
         # Ajoutez le nouveau client à la session
         session.add(new_client)
         session.commit()
+

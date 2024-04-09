@@ -1,31 +1,28 @@
 from controllers.auth_permissions import authenticate, authorize
 from views.login import login
-from models.clients import Client, Contract, Event
-from models.collaboration import Collaborator, Department
+from DAO.collaborator_dao import CollaboratorDAO
+from DAO.client_dao import ClientDAO
+from DAO.contract_dao import ContractDAO
+from DAO.event_dao import EventtDAO
 from connect_database import create_db_connection
 from sqlalchemy.orm import sessionmaker
 from tabulate import tabulate
-from utils.get_object import get_client_by_id, get_collaborator_by_id, get_contract_by_id
 from utils.decorators import department_permission_required
 
 session = create_db_connection()
+client_dao = ClientDAO(session)
 
 @department_permission_required(None) 
 def view_all_clients(token):
-    #authorized = authorize(token, None)
-    #if authorized:
-    #    print('Autorisation ok')
-    #else:
-    #    print('Autorisation pas ok')
 
     # Récupérer tous les clients de la base de données
-    clients = session.query(Client).all()
+    clients = client_dao.get_all_clients()
 
     if clients:
         # Préparer les données pour le tableau
         table_data = []
         for client in clients:
-            collaborator = get_collaborator_by_id(client.commercial_id)
+            collaborator = CollaboratorDAO.get_collaborator(client.commercial_id)
             row = [
                 client.id,
                 client.full_name,
@@ -51,14 +48,14 @@ def view_all_clients(token):
 def view_all_contracts(token):
 
     # Récupérer tous les contrats de la base de données
-    contracts = session.query(Contract).all()
+    contracts = ContractDAO.get_all_contracts()
 
     if contracts:
         # Préparer les données pour le tableau
         table_data = []
         # Afficher les informations des contrats
         for contract in contracts:
-            client = get_client_by_id(contract.client_id)
+            client = ClientDAO.get_client(contract.client_id)
             row = [
                 contract.id,
                 client.full_name if client else "Client inconnu",
@@ -78,17 +75,17 @@ def view_all_contracts(token):
 
 @department_permission_required(None) 
 def view_all_events(token):
-    events = session.query(Event).all()
+    events = EventtDAO.get_all_events()
 
     if events:
         table_data = []
 
         for event in events:
-            contract = get_contract_by_id(event.contract_id)
+            contract = ContractDAO.get_contract(event.contract_id)
             if contract:
-                client = get_client_by_id(contract.client_id)
+                client = ClientDAO.get_client(contract.client_id)
 
-            support = get_collaborator_by_id(event.support_id)
+            support = CollaboratorDAO.get_collaborator(event.support_id)
 
             row = [
                 event.id,

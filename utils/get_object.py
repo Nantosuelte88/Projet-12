@@ -17,22 +17,13 @@ def get_id_by_token(token):
     return collaborator_id
 
 
-def get_collaborator_by_id(collaborator_id):
-    collaborator = session.query(Collaborator).get(collaborator_id)
-    if not collaborator:
-        return None
-    return collaborator
+def search_corresponding(client_name):
+    clients_names_min = session.query(Client).filter(Client.full_name.ilike(client_name)).all()
 
-
-def get_client_by_id(client_id):
-    client = session.query(Client).get(client_id)
-    if not client:
-        return None
-    return client
-
-
-def get_contract_by_id(contract_id):
-    contract = session.query(Contract).get(contract_id)
-    if not contract:
-        return None
-    return contract
+    if clients_names_min:
+        if len(clients_names_min) == 1:
+            return True, clients_names_min[0]
+        else:
+            return True, clients_names_min
+    else:
+        return False, None

@@ -7,13 +7,20 @@ from views.login import login
 from views.data import view_all_clients, view_all_contracts, view_all_events
 from controllers.create_update import create_new_user
 
+
 # Définir la session SQLAlchemy
 session = create_db_connection()
 
-
+print("Test 1")
 token = login()
+print("Test 2")
+
 print(token)
+print("Test 3")
+
 view_all_clients(token)
+print("Test 4")
+
 # view_all_contracts(token)
 # view_all_events(token)
 
