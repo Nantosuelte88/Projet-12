@@ -8,37 +8,35 @@ from controllers.auth_permissions import authenticate, authorize
 from utils.input_validators import is_valid_email, is_valid_password
 
 
-def login():
+@click.command()
+@click.pass_context
+def login(ctx):
     """
     Permet de tester l'email et le mot de passe, reçoit le token
     """
     while True:
-        print('Veuillez entrer vos identifiatns :')
-        while True:
-            email = input('votre email:')
-            if is_valid_email(email):
-                print('Email valide')
-                break
-            else:
-                print('Veuillez entrer un email valide')
+        click.echo('Veuillez entrer vos identifiants :')
 
-        while True:
-            password = getpass.getpass('Votre mot de passe:')
-            if is_valid_password(password):
-                print('mdp à verifier')
-                break
-            else:
-                print('Veuillez un mot de passe valide')
+        email = click.prompt('Votre email', type=str)
+        if not is_valid_email(email):
+            click.echo('Veuillez entrer un email valide')
+            continue
 
-        if is_valid_email(email) and is_valid_password(password):
-            token = authenticate(email, password)
+        password = click.prompt('Votre mot de passe',
+                                hide_input=True, type=str)
+        if not is_valid_password(password):
+            click.echo('Veuillez entrer un mot de passe valide')
+            continue
 
-            if token:
-                authorized = authorize(token, None)
-                if authorized:
-                    print("Accès autorisé")
-                    return token
-                else:
-                    print("Accès non autorisé")
+        token = authenticate(email, password)
+
+        if token:
+            authorized = authorize(token, None)
+            if authorized:
+                click.echo("Accès autorisé")
+                ctx.obj["token"] = token
+                return
             else:
-                print("Échec de l'authentification")
+                click.echo("Accès non autorisé")
+        else:
+            click.echo("Échec de l'authentification")

@@ -2,12 +2,11 @@
 from connect_database import create_db_connection
 from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.orm import sessionmaker
-import bcrypt
 from models.collaboration import Collaborator, Department
 from models.clients import Client, Contract, Event
 from datetime import datetime, timedelta, timezone
 from utils.decorators import department_permission_required
-from views.create_update_data import view_create_user
+from views.create_update_data import view_create_client
 from utils.get_object import get_id_by_token
 
 session = create_db_connection()
@@ -15,16 +14,18 @@ session = create_db_connection()
 
 # si commercial
 @department_permission_required(3)
-def create_new_user(token):
-    
-    info_client = view_create_user(token)
+def create_new_client(token):
+
+    print("Dans fonction create_new_user du controller")
+    info_client = view_create_client()
+    print(info_client)
     if info_client:
 
         creation_date = datetime.now(timezone.utc)
         last_contact_date = None
         commercial_id = get_id_by_token(token)
         if info_client[3]:
-            #fonction pour verifier les entreprises existantes
+            # fonction pour verifier les entreprises existantes
             company_id = None
         else:
             company_id = None
@@ -45,4 +46,3 @@ def create_new_user(token):
         # Ajoutez le nouveau client à la session
         session.add(new_client)
         session.commit()
-

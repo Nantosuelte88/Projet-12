@@ -5,6 +5,7 @@ from models.collaboration import Collaborator, Department
 from connect_database import create_db_connection
 from sqlalchemy.orm import sessionmaker
 
+
 class ClientDAO:
     """
     DAO (Objet d'accès aux données) pour la gestion des clients.
@@ -21,48 +22,30 @@ class ClientDAO:
         clients = self.session.query(Client).all()
         return clients
 
-    def get_client(client_id):
-        session = create_db_connection()
-        try:
-            client = session.query(Client).get(client_id)
-            if not client:
-                return None
-            return client
-        finally:
-            session.close()
+    def get_client(self, client_id):
+        client = self.session.query(Client).get(client_id)
+        return client
 
-    def create_client(client_data):
-        session = create_db_connection()
-        try:
-            client = Client(**client_data)
-            session.add(client)
-            session.commit()
-            return client
-        finally:
-            session.close()
+    def create_client(self, client_data):
+        client = Client(**client_data)
+        self.session.add(client)
+        self.session.commit()
+        return client
 
-    def update_client(client_id, client_data):
-        session = create_db_connection()
-        try:
-            client = session.query(Client).get(client_id)
-            if not client:
-                return None
-            for key, value in client_data.items():
-                if hasattr(client, key):
-                    setattr(client, key, value)
-            session.commit()
-            return client
-        finally:
-            session.close()
+    def update_client(self, client_id, client_data):
+        client = self.session.query(Client).get(client_id)
+        if not client:
+            return None
+        for key, value in client_data.items():
+            if hasattr(client, key):
+                setattr(client, key, value)
+        self.session.commit()
+        return client
 
-    def delete_client(client_id):
-        session = create_db_connection()
-        try:
-            client = session.query(Client).get(client_id)
-            if not client:
-                return None
-            session.delete(client)
-            session.commit()
-            return client
-        finally:
-            session.close()
+    def delete_client(self, client_id):
+        client = self.session.query(Client).get(client_id)
+        if not client:
+            return None
+        self.session.delete(client)
+        self.session.commit()
+        return client

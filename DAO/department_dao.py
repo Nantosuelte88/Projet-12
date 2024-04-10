@@ -5,60 +5,43 @@ from models.collaboration import Collaborator, Department
 from connect_database import create_db_connection
 from sqlalchemy.orm import sessionmaker
 
-from connect_database import create_db_connection
-from sqlalchemy.orm import sessionmaker
-
 
 class DepartmentDAO:
-    def get_all_departments():
-        session = create_db_connection()
-        try:
-            departments = session.query(Department).all()
-            return departments
-        finally:
-            session.close()
+    """
+    DAO (Objet d'accès aux données) pour la gestion des départements.
+    """
 
+    def __init__(self, session):
+        self.session = session
 
-    def get_department(department_id):
-        session = create_db_connection()
-        try:
-            department = session.query(Department).get(department_id)
-            return department
-        finally:
-            session.close()
+    def get_all_departments(self):
+        departments = self.session.query(Department).all()
+        return departments
 
-    def create_department(department_data):
-        session = create_db_connection()
-        try:
-            department = Department(**department_data)
-            session.add(department)
-            session.commit()
-            return department
-        finally:
-            session.close()
+    def get_department(self, department_id):
+        department = self.session.query(Department).get(department_id)
+        return department
 
-    def update_department(department_id, department_data):
-        session = create_db_connection()
-        try:
-            department = session.query(Department).get(department_id)
-            if not department:
-                return None
-            for key, value in department_data.items():
-                if hasattr(department, key):
-                    setattr(department, key, value)
-            session.commit()
-            return department
-        finally:
-            session.close()
+    def create_department(self, department_data):
+        department = Department(**department_data)
+        self.session.add(department)
+        self.session.commit()
+        return department
 
-    def delete_department(department_id):
-        session = create_db_connection()
-        try:
-            department = session.query(Department).get(department_id)
-            if not department:
-                return None
-            session.delete(department)
-            session.commit()
-            return department
-        finally:
-            session.close()
+    def update_department(self, department_id, department_data):
+        department = self.session.query(Department).get(department_id)
+        if not department:
+            return None
+        for key, value in department_data.items():
+            if hasattr(department, key):
+                setattr(department, key, value)
+        self.session.commit()
+        return department
+
+    def delete_department(self, department_id):
+        department = self.session.query(Department).get(department_id)
+        if not department:
+            return None
+        self.session.delete(department)
+        self.session.commit()
+        return department

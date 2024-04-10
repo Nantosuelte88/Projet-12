@@ -79,7 +79,7 @@ def authorize(token, department_id):
         if department_id is None or user_department_id == department_id:
             return True
         else:
-            print("Autorisation refusée pour ce département")
+            print("Dans authorize; nope")
             return False
 
     except jwt.ExpiredSignatureError:

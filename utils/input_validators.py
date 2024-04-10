@@ -24,9 +24,7 @@ def is_valid_phone_number(phone_number):
     Vérifie si le numéro de téléphone est valide
     """
     pattern = r'^[\d\s+]+$'
-    if re.match(pattern, phone_number) is None:
-        return False
-    elif len(phone_number) > 10:
+    if len(phone_number) > 10:
         return False
     else:
         return True

@@ -10,6 +10,7 @@ def department_permission_required(department_id):
                 if authorized:
                     return func(token, *args, **kwargs)
                 else:
+                    print("Dans le decorateur")
                     print("Autorisation refusée pour ce département")
             else:
                 print("Utilisateur non connecté")

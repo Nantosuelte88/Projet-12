@@ -5,61 +5,43 @@ from models.collaboration import Collaborator, Department
 from connect_database import create_db_connection
 from sqlalchemy.orm import sessionmaker
 
-from connect_database import create_db_connection
-from sqlalchemy.orm import sessionmaker
-
 
 class CollaboratorDAO:
+    """
+    DAO (Objet d'accès aux données) pour la gestion des collaborateurs.
+    """
 
-    
-    def get_all_collaborators():
-        session = create_db_connection()
-        try:
-            collaborators = session.query(Collaborator).all()
-            return collaborators
-        finally:
-            session.close()
+    def __init__(self, session):
+        self.session = session
 
-    def get_collaborator(collaborator_id):
-        session = create_db_connection()
-        try:
-            collaborator = session.query(Collaborator).get(collaborator_id)
-            return collaborator
-        finally:
-            session.close()
+    def get_all_collaborators(self):
+        collaborators = self.session.query(Collaborator).all()
+        return collaborators
 
-    def create_collaborator(collaborator_data):
-        session = create_db_connection()
-        try:
-            collaborator = Collaborator(**collaborator_data)
-            session.add(collaborator)
-            session.commit()
-            return collaborator
-        finally:
-            session.close()
+    def get_collaborator(self, collaborator_id):
+        collaborator = self.session.query(Collaborator).get(collaborator_id)
+        return collaborator
 
-    def update_collaborator(collaborator_id, collaborator_data):
-        session = create_db_connection()
-        try:
-            collaborator = session.query(Collaborator).get(collaborator_id)
-            if not collaborator:
-                return None
-            for key, value in collaborator_data.items():
-                if hasattr(collaborator, key):
-                    setattr(collaborator, key, value)
-            session.commit()
-            return collaborator
-        finally:
-            session.close()
+    def create_collaborator(self, collaborator_data):
+        collaborator = Collaborator(**collaborator_data)
+        self.session.add(collaborator)
+        self.session.commit()
+        return collaborator
 
-    def delete_collaborator(collaborator_id):
-        session = create_db_connection()
-        try:
-            collaborator = session.query(Collaborator).get(collaborator_id)
-            if not collaborator:
-                return None
-            session.delete(collaborator)
-            session.commit()
-            return collaborator
-        finally:
-            session.close()
+    def update_collaborator(self, collaborator_id, collaborator_data):
+        collaborator = self.session.query(Collaborator).get(collaborator_id)
+        if not collaborator:
+            return None
+        for key, value in collaborator_data.items():
+            if hasattr(collaborator, key):
+                setattr(collaborator, key, value)
+        self.session.commit()
+        return collaborator
+
+    def delete_collaborator(self, collaborator_id):
+        collaborator = self.session.query(Collaborator).get(collaborator_id)
+        if not collaborator:
+            return None
+        self.session.delete(collaborator)
+        self.session.commit()
+        return collaborator

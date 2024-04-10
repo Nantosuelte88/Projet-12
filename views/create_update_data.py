@@ -14,10 +14,7 @@ from utils.input_validators import is_valid_email, is_valid_phone_number
 session = create_db_connection()
 
 
-@click.command()
-@click.option('--token', required=True, help='Le token d\'authentification')
-@department_permission_required(3)
-def view_create_user(token):
+def view_create_client():
     """
     Crée un nouveau client
     """
@@ -48,10 +45,12 @@ def view_create_user(token):
             click.echo(
                 "Le nom de l'entreprise ne doit contenir que des chiffres, des lettres et des espaces.")
             company_name = click.prompt('Nom de l\'entreprise', type=str)
+
+    new_client.extend([full_name, email, phone_number])
+    if response.upper() == 'Y':
         new_client.append(company_name)
     else:
         new_client.append(None)
 
-    new_client.extend([full_name, email, phone_number])
-
     return new_client
+
