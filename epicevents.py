@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 from controllers.auth_permissions import authenticate, authorize
 from views.login import login
 from views.data import view_all_clients, view_all_contracts, view_all_events
-from controllers.create_update import create_new_client
+from controllers.client_crud import create_new_client, update_client
 
 # Charger les variables d'environnement à partir du fichier .env
 load_dotenv()
@@ -67,6 +67,30 @@ def view_clients_command(ctx):
 
 @cli.command()
 @click.pass_context
+def view_contracts_command(ctx):
+    token = ctx.obj["token"]
+
+    if token is None:
+        click.echo(
+            "Veuillez vous connecter en utilisant la commande 'login' avant d'afficher les contrats.")
+        return
+    view_all_contracts(token)
+
+
+@cli.command()
+@click.pass_context
+def view_events_command(ctx):
+    token = ctx.obj["token"]
+
+    if token is None:
+        click.echo(
+            "Veuillez vous connecter en utilisant la commande 'login' avant d'afficher les événementss.")
+        return
+    view_all_events(token)
+
+
+@cli.command()
+@click.pass_context
 def create_user_command(ctx):
     token = ctx.obj["token"]
 
@@ -75,6 +99,19 @@ def create_user_command(ctx):
             "Veuillez vous connecter en utilisant la commande 'login' avant de créer un nouvel utilisateur.")
         return
     create_new_client(token)
+
+
+@cli.command()
+@click.pass_context
+def update_client_command(ctx):
+    token = ctx.obj["token"]
+
+    if token is None:
+        click.echo(
+            "Veuillez vous connecter en utilisant la commande 'login' avant de modifier un utilisateur.")
+        return
+    update_client(token)
+
 
 
 if __name__ == "__main__":

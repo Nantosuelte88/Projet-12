@@ -1,6 +1,6 @@
 import jwt
 import os
-from models.clients import Client, Contract, Event
+from models.clients import Client, Contract, Event, Company
 from models.collaboration import Collaborator, Department
 from connect_database import create_db_connection
 from sqlalchemy.orm import sessionmaker
@@ -28,6 +28,8 @@ class ClientDAO:
 
     def create_client(self, client_data):
         client = Client(**client_data)
+        for key, value in client_data.items():
+            setattr(client, key, value)
         self.session.add(client)
         self.session.commit()
         return client
@@ -37,8 +39,8 @@ class ClientDAO:
         if not client:
             return None
         for key, value in client_data.items():
-            if hasattr(client, key):
-                setattr(client, key, value)
+            setattr(client, key, value)
+        self.session.add(client)
         self.session.commit()
         return client
 
