@@ -7,6 +7,7 @@ from DAO.client_dao import ClientDAO
 from DAO.company_dao import CompanyDAO
 from DAO.contract_dao import ContractDAO
 from views.view_contract import view_create_contract, wich_contract, view_update_contract
+from views.view_collaborator import wich_collaborator
 
 from views.login import login
 from DAO.collaborator_dao import CollaboratorDAO
@@ -17,6 +18,12 @@ from connect_database import create_db_connection
 from sqlalchemy.orm import sessionmaker
 from tabulate import tabulate
 from utils.decorators import department_permission_required
+
+COMMERCIAL = 3
+GESTION = 2
+SUPPORT = 1
+
+
 
 session = create_db_connection()
 client_dao = ClientDAO(session)
@@ -97,6 +104,22 @@ def view_create_event(client, contract):
         click.echo('Veuillez entrer une donnée valide')
         notes = click.prompt('Commentaire ', type=str)
     new_event.append(notes)
+
+    response = click.prompt('Voulez-vous ajouter un collaborateur du département support ? (O/N)', type=str)
+    while response.upper() != 'O' and response.upper() != 'N':
+        click.echo('Veuillez répondre par "O" pour Oui et "N" pour Non')
+        response = click.prompt('Voulez-vous ajouter un collaborateur du département support ? (O/N)', type=str)
+    if response.upper() == 'O':
+        collaborator_id = wich_collaborator(SUPPORT)
+        click.echo(f'collabo : {collaborator_id}')
+        if collaborator_id:
+            collaborator = collaborator_id
+        else:
+            collaborator = None
+    else:
+        collaborator = None
+
+    new_event.append(collaborator)
 
     return new_event
 

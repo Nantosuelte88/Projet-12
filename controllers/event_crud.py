@@ -33,6 +33,27 @@ def create_event(token):
         if client:
             event_data = view_create_event(client, contract)
             print(event_data)
+            support = event_data[6]
+            if support:
+                support_id = support
+            else:
+                support_id = None
+
+
+            new_event_data = {
+                'name': event_data[0],
+                'contract_id': contract.id,
+                'date_start': event_data[1],
+                'date_end': event_data[2],
+                'support_id': support_id,
+                'location': event_data[3],
+                'attendees': event_data[4],
+                'notes': event_data[5]
+            }
+
+            new_event = event_dao.create_event(new_event_data)
+            if new_event:
+                print('yep', new_event)
 
 def update_event(token):
     pass

@@ -22,6 +22,10 @@ class CollaboratorDAO:
         collaborator = self.session.query(Collaborator).get(collaborator_id)
         return collaborator
 
+    def get_corresponding_company(self, company_name):
+        collaborators_names_min = self.session.query(Collaborator).filter(Collaborator.full_name.ilike(f"%{company_name}%")).all()
+        return collaborators_names_min
+
     def create_collaborator(self, collaborator_data):
         collaborator = Collaborator(**collaborator_data)
         self.session.add(collaborator)

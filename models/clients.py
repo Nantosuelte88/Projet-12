@@ -44,7 +44,7 @@ class Event(Base):
     contract_id = Column(Integer, ForeignKey('contracts.id'))
     date_start = Column(Date)
     date_end = Column(Date)
-    support_id = Column(Integer, ForeignKey('collaborators.id'))
+    support_id = Column(Integer, ForeignKey('collaborators.id'), nullable=True)
     location = Column(String(150))
     attendees = Column(Integer)
     notes = Column(String(250))
