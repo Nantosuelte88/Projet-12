@@ -21,6 +21,10 @@ class CompanyDAO:
     def get_company(self, company_id):
         company = self.session.query(Company).get(company_id)
         return company
+    
+    def get_corresponding_company(self, company_name):
+        companys_names_min = self.session.query(Company).filter(Company.name.ilike(f"%{company_name}%")).all()
+        return companys_names_min
 
     def get_company_by_name(self, company_name):
         company = self.session.query(Company).filter_by(name=company_name).first()

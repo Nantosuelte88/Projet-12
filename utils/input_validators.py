@@ -1,5 +1,5 @@
 import re
-
+import datetime
 
 def is_valid_email(email):
     """
@@ -13,11 +13,12 @@ def is_valid_password(password):
     """
     Vérifie si le mot de passe est valide
     """
-    # Exemple de règles de validation du mot de passe
+    # revoir le mot de passe
     if len(password) < 10:
         return False
 
     return True
+
 
 def is_valid_phone_number(phone_number):
     """
@@ -28,3 +29,16 @@ def is_valid_phone_number(phone_number):
         return False
     else:
         return True
+
+
+def is_valid_money_format(value):
+    pattern = r'^[0-9]+(?:\.[0-9]+)?$'
+    return re.match(pattern, value) is not None
+
+
+def is_valid_date_format(date_string):
+    try:
+        datetime.datetime.strptime(date_string, '%Y-%m-%d')
+        return True
+    except ValueError:
+        return False

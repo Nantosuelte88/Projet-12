@@ -6,17 +6,16 @@ from models.collaboration import Collaborator, Department
 from models.clients import Client, Contract, Event
 from datetime import datetime, timedelta, timezone
 from utils.decorators import department_permission_required
-from views.view_create_update_client import view_create_client, wich_customer, view_update_client
+from views.view_client import view_create_client, wich_customer, view_update_client
 from utils.get_object import get_id_by_token
 from DAO.client_dao import ClientDAO
 from DAO.company_dao import CompanyDAO
 
 session = create_db_connection()
-# Création de l'instance du DAO Client
 client_dao = ClientDAO(session)
 company_dao = CompanyDAO(session)
 
-# si commercial
+
 @department_permission_required(3)
 def create_new_client(token):
     print("Dans fonction create_new_user du controller")
@@ -73,5 +72,3 @@ def update_client(token):
         if modified_client:
             modified = True
             view_update_client(client, modified)
-
-

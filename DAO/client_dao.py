@@ -26,6 +26,10 @@ class ClientDAO:
         client = self.session.query(Client).get(client_id)
         return client
 
+    def get_clients_by_name(self, client_name):
+        clients = self.session.query(Client).filter(Client.full_name.ilike(f"%{client_name}%")).all()
+        return clients
+
     def create_client(self, client_data):
         client = Client(**client_data)
         for key, value in client_data.items():

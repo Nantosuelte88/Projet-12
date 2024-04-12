@@ -24,6 +24,10 @@ class ContractDAO:
         if not contract:
             return None
         return contract
+    
+    def get_contracts_by_client_id(self, client_id):
+        contracts = self.session.query(Contract).filter_by(client_id=client_id).all()
+        return contracts
 
     def create_contract(self, contract_data):
         contract = Contract(**contract_data)
