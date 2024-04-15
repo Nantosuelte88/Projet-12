@@ -72,7 +72,6 @@ def create_event(token):
                 view_no_event_with_contract_unsigned(client, contract)
 
 
-
 def update_event(token):
     client = wich_customer()
     contracts = contract_dao.get_contracts_by_client_id(client.id)

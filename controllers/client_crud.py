@@ -73,7 +73,6 @@ def create_new_client(token):
             view_create_client(created)
 
 
-@department_permission_required(3)
 def update_client(token):
     modified = False
     client = wich_customer()

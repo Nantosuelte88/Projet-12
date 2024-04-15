@@ -48,10 +48,7 @@ def authenticate(email, password):
         return None
 
 
-def authorize(token, department_id):
-    """
-    Fonction pour l'autorisation
-    """
+def authorize(token):
     try:
         # Vérifier la validité et l'intégrité du token
         payload = jwt.decode(token, secret_key, algorithms=['HS256'])
@@ -72,21 +69,26 @@ def authorize(token, department_id):
             token = new_token
             payload = jwt.decode(token, secret_key, algorithms=['HS256'])
 
-        # Accéder à l'ID du département du token
-        user_department_id = payload['department_id']
-
-        # Vérifier si l'ID du département correspond à celui souhaité
-        if department_id is None or user_department_id == department_id:
-            return True
-        else:
-            print("Dans authorize; nope")
-            return False
+        return True
 
     except jwt.ExpiredSignatureError:
         return False
     except jwt.InvalidTokenError:
         return False
 
+def verify_department(token, department_id):
+    try:
+        payload = jwt.decode(token, secret_key, algorithms=['HS256'])
+        user_department_id = payload['department_id']
+
+        if department_id is None or user_department_id == department_id:
+            return True
+
+        return False
+
+    except jwt.InvalidTokenError:
+        return False
+    
 
 def refresh_token(old_token):
     try:

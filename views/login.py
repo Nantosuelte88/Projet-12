@@ -31,7 +31,7 @@ def login(ctx):
         token = authenticate(email, password)
 
         if token:
-            authorized = authorize(token, None)
+            authorized = authorize(token)
             if authorized:
                 click.echo("Accès autorisé")
                 ctx.obj["token"] = token

@@ -67,7 +67,6 @@ def view_events(events):
 def view_no_event_with_contract_unsigned(contract, client):
     click.echo(f'Le contrat n°{contract.id} du client {client.full_name} , n\'est pas signé. Vous ne pouvez pas créer d\'événement avec un contrat non signé')
 
-
 def view_create_event(client, contract, created):
     if created:
         click.echo('Nouvel événement crée avec succès')

@@ -61,9 +61,8 @@ def prints_test(ctx):
 def view_clients_command(ctx):
     token = ctx.obj["token"]
 
-    if token is None:
-        click.echo(
-            "Veuillez vous connecter en utilisant la commande 'login' avant d'afficher les clients.")
+    if token is None or not authorize(token):
+        click.echo("Veuillez vous connecter en utilisant la commande 'login' avant d'afficher les clients.")
         return
     display_all_clients(token)
 
@@ -73,7 +72,7 @@ def view_clients_command(ctx):
 def view_my_clients_command(ctx):
     token = ctx.obj["token"]
 
-    if token is None:
+    if token is None or not authorize(token):
         click.echo(
             "Veuillez vous connecter en utilisant la commande 'login' avant d'afficher les clients qui vous sont associés.")
         return
@@ -85,7 +84,7 @@ def view_my_clients_command(ctx):
 def create_user_command(ctx):
     token = ctx.obj["token"]
 
-    if token is None:
+    if token is None or not authorize(token):
         click.echo(
             "Veuillez vous connecter en utilisant la commande 'login' avant de créer un nouvel utilisateur.")
         return
@@ -97,7 +96,7 @@ def create_user_command(ctx):
 def update_client_command(ctx):
     token = ctx.obj["token"]
 
-    if token is None:
+    if token is None or not authorize(token):
         click.echo(
             "Veuillez vous connecter en utilisant la commande 'login' avant de modifier un utilisateur.")
         return
@@ -108,7 +107,7 @@ def update_client_command(ctx):
 def delete_client_command(ctx):
     token = ctx.obj["token"]
 
-    if token is None:
+    if token is None or not authorize(token):
         click.echo(
             "Veuillez vous connecter en utilisant la commande 'login' avant de supprimer un utilisateur.")
         return
@@ -121,7 +120,7 @@ def delete_client_command(ctx):
 def create_collaborator_command(ctx):
     token = ctx.obj["token"]
 
-    if token is None:
+    if token is None or not authorize(token):
         click.echo(
             "Veuillez vous connecter en utilisant la commande 'login' avant de créer un collaborateur.")
         return
@@ -133,7 +132,7 @@ def create_collaborator_command(ctx):
 def update_collaborator_command(ctx):
     token = ctx.obj["token"]
 
-    if token is None:
+    if token is None or not authorize(token):
         click.echo(
             "Veuillez vous connecter en utilisant la commande 'login' avant de modifier un collaborateur.")
         return
@@ -144,7 +143,7 @@ def update_collaborator_command(ctx):
 def delete_collaborator_command(ctx):
     token = ctx.obj["token"]
 
-    if token is None:
+    if token is None or not authorize(token):
         click.echo(
             "Veuillez vous connecter en utilisant la commande 'login' avant de supprimer un collaborateur.")
         return
@@ -157,7 +156,7 @@ def delete_collaborator_command(ctx):
 def view_contracts_command(ctx):
     token = ctx.obj["token"]
 
-    if token is None:
+    if token is None or not authorize(token):
         click.echo(
             "Veuillez vous connecter en utilisant la commande 'login' avant d'afficher les contrats.")
         return
@@ -168,7 +167,7 @@ def view_contracts_command(ctx):
 def create_contract_command(ctx):
     token = ctx.obj["token"]
 
-    if token is None:
+    if token is None or not authorize(token):
         click.echo(
             "Veuillez vous connecter en utilisant la commande 'login' avant de créer un contrat.")
         return
@@ -180,7 +179,7 @@ def create_contract_command(ctx):
 def update_contract_command(ctx):
     token = ctx.obj["token"]
 
-    if token is None:
+    if token is None or not authorize(token):
         click.echo(
             "Veuillez vous connecter en utilisant la commande 'login' avant de modifier un contrat.")
         return
@@ -191,7 +190,7 @@ def update_contract_command(ctx):
 def view_contracts_unpaid(ctx):
     token = ctx.obj["token"]
 
-    if token is None:
+    if token is None or not authorize(token):
         click.echo(
             "Veuillez vous connecter en utilisant la commande 'login' avant d'afficher les contrats impayés.")
         return
@@ -203,7 +202,7 @@ def view_contracts_unpaid(ctx):
 def view_unsigned_contracts(ctx):
     token = ctx.obj["token"]
 
-    if token is None:
+    if token is None or not authorize(token):
         click.echo(
             "Veuillez vous connecter en utilisant la commande 'login' avant d'afficher les contrats non signés.")
         return
@@ -215,7 +214,7 @@ def view_unsigned_contracts(ctx):
 def delete_contract_command(ctx):
     token = ctx.obj["token"]
 
-    if token is None:
+    if token is None or not authorize(token):
         click.echo(
             "Veuillez vous connecter en utilisant la commande 'login' avant de supprimer un contrat.")
         return
@@ -228,7 +227,7 @@ def delete_contract_command(ctx):
 def view_events_command(ctx):
     token = ctx.obj["token"]
 
-    if token is None:
+    if token is None or not authorize(token):
         click.echo(
             "Veuillez vous connecter en utilisant la commande 'login' avant d'afficher les événementss.")
         return
@@ -239,7 +238,7 @@ def view_events_command(ctx):
 def create_event_command(ctx):
     token = ctx.obj["token"]
 
-    if token is None:
+    if token is None or not authorize(token):
         click.echo(
             "Veuillez vous connecter en utilisant la commande 'login' avant de créer un événement.")
         return
@@ -251,7 +250,7 @@ def create_event_command(ctx):
 def update_event_command(ctx):
     token = ctx.obj["token"]
 
-    if token is None:
+    if token is None or not authorize(token):
         click.echo(
             "Veuillez vous connecter en utilisant la commande 'login' avant de modifier un événement.")
         return
@@ -262,7 +261,7 @@ def update_event_command(ctx):
 def event_without_support_command(ctx):
     token = ctx.obj["token"]
 
-    if token is None:
+    if token is None or not authorize(token):
         click.echo(
             "Veuillez vous connecter en utilisant la commande 'login' avant d'afficher les événements sans support.")
         return
@@ -273,7 +272,7 @@ def event_without_support_command(ctx):
 def view_my_events_command(ctx):
     token = ctx.obj["token"]
 
-    if token is None:
+    if token is None or not authorize(token):
         click.echo(
             "Veuillez vous connecter en utilisant la commande 'login' avant d'afficher les événements qui vous sont associés.")
         return
@@ -285,7 +284,7 @@ def view_my_events_command(ctx):
 def delete_event_command(ctx):
     token = ctx.obj["token"]
 
-    if token is None:
+    if token is None or not authorize(token):
         click.echo(
             "Veuillez vous connecter en utilisant la commande 'login' avant de supprimer un événement.")
         return
