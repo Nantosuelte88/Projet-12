@@ -11,13 +11,28 @@ from utils.get_object import get_id_by_token
 from DAO.client_dao import ClientDAO
 from DAO.company_dao import CompanyDAO
 from DAO.contract_dao import ContractDAO
-from views.view_contract import view_create_contract, wich_contract, view_update_contract
+from views.view_contract import view_create_contract, wich_contract, view_update_contract, view_contracts, view_delete_contract
 
 
 session = create_db_connection()
 client_dao = ClientDAO(session)
 company_dao = CompanyDAO(session)
 contract_dao = ContractDAO(session)
+
+def display_all_contracts(token):
+    # Récupérer tous les contrats de la base de données
+    contracts = contract_dao.get_all_contracts()
+    view_contracts(contracts)
+
+
+def display_contracts_unpaid(token):
+    contracts = contract_dao.get_unpaid()
+    view_contracts(contracts)
+
+def display_unsigned_contracts(token):
+    contracts = contract_dao.get_contract_unsigned()
+    view_contracts(contracts)
+
 
 def create_contract(token):
     client = wich_customer()
@@ -55,3 +70,15 @@ def update_contract(token):
         if modification:
             modified = True
             view_update_contract(contract, client, modified)
+
+def delete_contract(token):
+    contract = wich_contract()
+    if contract:
+        deleted = False
+        client = client_dao.get_client(contract.client_id)
+        response = view_delete_contract(contract, client, deleted)
+        if response:
+            remove =contract_dao.delete_contract(contract.id)
+            if remove:
+                deleted = True
+                view_delete_contract(contract, client, deleted)

@@ -24,7 +24,19 @@ class EventDAO:
         if not event:
             return None
         return event
+    
+    def get_event_by_contract_id(self, contract_id):
+        events = self.session.query(Event).filter_by(contract_id=contract_id)
+        return events
+    
+    def get_events_by_collaborator_id(self, collaborator_id):
+        events = self.session.query(Event).filter_by(support_id=collaborator_id).all()
+        return events
 
+    def get_events_without_support(self):
+        events = self.session.query(Event).filter(Event.support_id.is_(None)).all()
+        return events
+    
     def create_event(self, event_data):
         event = Event(**event_data)
         self.session.add(event)

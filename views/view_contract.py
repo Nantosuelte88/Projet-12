@@ -19,11 +19,7 @@ contract_dao = ContractDAO(session)
 event_dao = EventDAO(session)
 
 
-@department_permission_required(None) 
-def view_all_contracts(token):
-
-    # Récupérer tous les contrats de la base de données
-    contracts = contract_dao.get_all_contracts()
+def view_contracts(contracts):
 
     if contracts:
         # Préparer les données pour le tableau
@@ -97,11 +93,10 @@ def wich_contract():
                     click.echo("  - Contrat non signé")
 
            
-            selected_idx = click.prompt("Entrez le numéro du contrat à modifier ", type=int)
+            selected_idx = click.prompt("Sélectionner le numéro du contrat ", type=int)
             
             if 1 <= selected_idx <= len(contracts):
                 selected_contract = contracts[selected_idx - 1]
-                # Appeler une fonction pour modifier le contrat sélectionné
                 return selected_contract
             else:
                 click.echo("Numéro de contrat invalide.")
@@ -159,3 +154,14 @@ def view_update_contract(contract, client_name, modified):
 
         return contract_data
         
+def view_delete_contract(contract, client, deleted):
+    if deleted:
+        click.echo('Contrat supprimé avec succès')
+    else:
+        click.echo(f'Suppresion du contrat de {client.full_name}, d\'un montant de {contract.total_amount}')
+        response = click.prompt('Souhaitez-vous supprimer ce contrat ? (O/N)')
+        if response.upper() == 'O':
+            return True
+        else:
+            click.echo('Suppression annulée')
+            return False

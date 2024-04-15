@@ -3,12 +3,10 @@ import os
 from dotenv import load_dotenv
 from controllers.auth_permissions import authenticate, authorize
 from views.login import login
-from views.view_client import view_all_clients
-from views.view_contract import view_all_contracts
-from views.view_event import view_all_events
-from controllers.client_crud import create_new_client, update_client
-from controllers.contract_crud import create_contract, update_contract
-from controllers.event_crud import create_event
+from controllers.client_crud import display_all_clients, delete_client, display_my_clients, create_new_client, update_client
+from controllers.contract_crud import display_all_contracts, display_contracts_unpaid, display_unsigned_contracts, create_contract, update_contract, delete_contract
+from controllers.event_crud import display_all_events, display_event_without_support, display_my_events, create_event, update_event, delete_event
+from controllers.collaborator_crud import create_collaborator, update_collaborator, delete_collaborator
 
 # Charger les variables d'environnement à partir du fichier .env
 load_dotenv()
@@ -57,6 +55,7 @@ def prints_test(ctx):
         print("Le fichier token.txt n'existe pas.")
 
 
+# Clients = affichage, création, modification, suppresion
 @cli.command()
 @click.pass_context
 def view_clients_command(ctx):
@@ -66,31 +65,19 @@ def view_clients_command(ctx):
         click.echo(
             "Veuillez vous connecter en utilisant la commande 'login' avant d'afficher les clients.")
         return
-    view_all_clients(token)
+    display_all_clients(token)
 
 
 @cli.command()
 @click.pass_context
-def view_contracts_command(ctx):
+def view_my_clients_command(ctx):
     token = ctx.obj["token"]
 
     if token is None:
         click.echo(
-            "Veuillez vous connecter en utilisant la commande 'login' avant d'afficher les contrats.")
+            "Veuillez vous connecter en utilisant la commande 'login' avant d'afficher les clients qui vous sont associés.")
         return
-    view_all_contracts(token)
-
-
-@cli.command()
-@click.pass_context
-def view_events_command(ctx):
-    token = ctx.obj["token"]
-
-    if token is None:
-        click.echo(
-            "Veuillez vous connecter en utilisant la commande 'login' avant d'afficher les événementss.")
-        return
-    view_all_events(token)
+    display_my_clients(token)
 
 
 @cli.command()
@@ -116,6 +103,65 @@ def update_client_command(ctx):
         return
     update_client(token)
 
+@cli.command()
+@click.pass_context
+def delete_client_command(ctx):
+    token = ctx.obj["token"]
+
+    if token is None:
+        click.echo(
+            "Veuillez vous connecter en utilisant la commande 'login' avant de supprimer un utilisateur.")
+        return
+    delete_client(token)
+
+
+# Collaborateurs = création, modification, suppression
+@cli.command()
+@click.pass_context
+def create_collaborator_command(ctx):
+    token = ctx.obj["token"]
+
+    if token is None:
+        click.echo(
+            "Veuillez vous connecter en utilisant la commande 'login' avant de créer un collaborateur.")
+        return
+    create_collaborator(token)
+
+
+@cli.command()
+@click.pass_context
+def update_collaborator_command(ctx):
+    token = ctx.obj["token"]
+
+    if token is None:
+        click.echo(
+            "Veuillez vous connecter en utilisant la commande 'login' avant de modifier un collaborateur.")
+        return
+    update_collaborator(token)
+
+@cli.command()
+@click.pass_context
+def delete_collaborator_command(ctx):
+    token = ctx.obj["token"]
+
+    if token is None:
+        click.echo(
+            "Veuillez vous connecter en utilisant la commande 'login' avant de supprimer un collaborateur.")
+        return
+    delete_collaborator(token)
+
+
+# Contrats = affichage, création, modification et suppression
+@cli.command()
+@click.pass_context
+def view_contracts_command(ctx):
+    token = ctx.obj["token"]
+
+    if token is None:
+        click.echo(
+            "Veuillez vous connecter en utilisant la commande 'login' avant d'afficher les contrats.")
+        return
+    display_all_contracts(token)
 
 @cli.command()
 @click.pass_context
@@ -142,6 +188,54 @@ def update_contract_command(ctx):
 
 @cli.command()
 @click.pass_context
+def view_contracts_unpaid(ctx):
+    token = ctx.obj["token"]
+
+    if token is None:
+        click.echo(
+            "Veuillez vous connecter en utilisant la commande 'login' avant d'afficher les contrats impayés.")
+        return
+    display_contracts_unpaid(token)
+
+
+@cli.command()
+@click.pass_context
+def view_unsigned_contracts(ctx):
+    token = ctx.obj["token"]
+
+    if token is None:
+        click.echo(
+            "Veuillez vous connecter en utilisant la commande 'login' avant d'afficher les contrats non signés.")
+        return
+    display_unsigned_contracts(token)
+
+
+@cli.command()
+@click.pass_context
+def delete_contract_command(ctx):
+    token = ctx.obj["token"]
+
+    if token is None:
+        click.echo(
+            "Veuillez vous connecter en utilisant la commande 'login' avant de supprimer un contrat.")
+        return
+    delete_contract(token) 
+
+
+# Evénement =affichage, création, modfication, suppression
+@cli.command()
+@click.pass_context
+def view_events_command(ctx):
+    token = ctx.obj["token"]
+
+    if token is None:
+        click.echo(
+            "Veuillez vous connecter en utilisant la commande 'login' avant d'afficher les événementss.")
+        return
+    display_all_events(token)
+
+@cli.command()
+@click.pass_context
 def create_event_command(ctx):
     token = ctx.obj["token"]
 
@@ -151,6 +245,51 @@ def create_event_command(ctx):
         return
     create_event(token)
 
+
+@cli.command()
+@click.pass_context
+def update_event_command(ctx):
+    token = ctx.obj["token"]
+
+    if token is None:
+        click.echo(
+            "Veuillez vous connecter en utilisant la commande 'login' avant de modifier un événement.")
+        return
+    update_event(token)
+
+@cli.command()
+@click.pass_context
+def event_without_support_command(ctx):
+    token = ctx.obj["token"]
+
+    if token is None:
+        click.echo(
+            "Veuillez vous connecter en utilisant la commande 'login' avant d'afficher les événements sans support.")
+        return
+    display_event_without_support(token)
+
+@cli.command()
+@click.pass_context
+def view_my_events_command(ctx):
+    token = ctx.obj["token"]
+
+    if token is None:
+        click.echo(
+            "Veuillez vous connecter en utilisant la commande 'login' avant d'afficher les événements qui vous sont associés.")
+        return
+    display_my_events(token)
+
+
+@cli.command()
+@click.pass_context
+def delete_event_command(ctx):
+    token = ctx.obj["token"]
+
+    if token is None:
+        click.echo(
+            "Veuillez vous connecter en utilisant la commande 'login' avant de supprimer un événement.")
+        return
+    delete_event(token)
 
 if __name__ == "__main__":
     cli()

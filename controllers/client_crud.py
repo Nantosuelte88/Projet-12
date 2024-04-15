@@ -6,7 +6,7 @@ from models.collaboration import Collaborator, Department
 from models.clients import Client, Contract, Event
 from datetime import datetime, timedelta, timezone
 from utils.decorators import department_permission_required
-from views.view_client import view_create_client, wich_customer, view_update_client
+from views.view_client import view_clients, view_create_client, wich_customer, view_update_client, view_delete_client
 from utils.get_object import get_id_by_token
 from DAO.client_dao import ClientDAO
 from DAO.company_dao import CompanyDAO
@@ -16,11 +16,33 @@ client_dao = ClientDAO(session)
 company_dao = CompanyDAO(session)
 
 
+def display_all_clients(token):
+    # Récupérer tous les clients de la base de données
+    clients = client_dao.get_all_clients()
+    view_clients(clients)
+
+
+def display_my_clients(token):
+    collaborator_id = get_id_by_token(token)
+    clients = client_dao.get_clients_by_collaborator_id(collaborator_id)
+    view_clients(clients)
+
+
+def delete_client(token):
+    client = wich_customer()
+    deleted = False
+    choice = view_delete_client(client, deleted)
+    if choice:
+        remove = client_dao.delete_client(client.id)
+        if remove:
+            deleted = True
+            view_delete_client(client, deleted)
+
+
 @department_permission_required(3)
 def create_new_client(token):
-    print("Dans fonction create_new_user du controller")
-    info_client = view_create_client()
-    print(info_client)
+    created = False
+    info_client = view_create_client(created)
     if info_client:
         creation_date = datetime.now(timezone.utc)
         last_contact_date = None
@@ -47,9 +69,8 @@ def create_new_client(token):
         new_client = client_dao.create_client(new_client_data)
 
         if new_client:
-            print("Nouveau client enregistré avec succès")
-        else:
-            print("Une erreur s'est produite")
+            created = True
+            view_create_client(created)
 
 
 @department_permission_required(3)

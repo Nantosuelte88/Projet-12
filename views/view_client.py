@@ -15,12 +15,7 @@ collaborator_dao = CollaboratorDAO(session)
 client_dao = ClientDAO(session)
 
 
-@department_permission_required(None)
-def view_all_clients(token):
-
-    # Récupérer tous les clients de la base de données
-    clients = client_dao.get_all_clients()
-
+def view_clients(clients):
     if clients:
         # Préparer les données pour le tableau
         table_data = []
@@ -47,56 +42,60 @@ def view_all_clients(token):
         print("Aucun client à afficher")
 
 
-def view_create_client():
+def view_create_client(created):
     """
     Crée un nouveau client
     """
-    click.echo("Création d'un nouveau client :")
+    if created:
+        click.echo("Nouveau client enregistré avec succès")
 
-    new_client = []
-
-    full_name = click.prompt('Nom complet', type=str)
-    while not all(c.isalnum() or c.isspace() for c in full_name):
-        click.echo('Veuillez entrer un nom complet valide')
-        full_name = click.prompt('Nom complet', type=str)
-
-    email = click.prompt('Email', type=str)
-    while not is_valid_email(email):
-        click.echo('Veuillez entrer un email valide')
-        email = click.prompt('Email', type=str)
-
-    phone_number = click.prompt('Numéro de téléphone', type=str)
-    while not is_valid_phone_number(phone_number):
-        click.echo('Veuillez entrer un numéro de téléphone valide')
-        phone_number = click.prompt('Numéro de téléphone', type=str)
-
-    response = click.prompt(
-        'Voulez-vous entrer un nom d\'entreprise? (O/N)', type=str)
-    if response.upper() == 'O':
-        company_name = click.prompt('Nom de l\'entreprise', type=str)
-        while not all(c.isalnum() or c.isspace() for c in company_name):
-            click.echo(
-                "Le nom de l'entreprise ne doit contenir que des chiffres, des lettres et des espaces.")
-            company_name = click.prompt('Nom de l\'entreprise', type=str)
-        company_name, company_id = wich_company(company_name)
-        if company_id is not None:
-            click.echo("Le client sera créé avec l'entreprise associée")
-            new_client.extend(
-                [full_name, email, phone_number, company_name, company_id])
-        else:
-            click.echo(
-                "Le client sera créé sans entreprise associée gkdfjgkvjfdc")
-            new_client.extend(
-                [full_name, email, phone_number, company_name, None])
     else:
-        click.echo("Le client sera créé sans entreprise associée")
-        new_client.extend([full_name, email, phone_number, None, None])
+        click.echo("Création d'un nouveau client :")
 
-    return new_client
+        new_client = []
+
+        full_name = click.prompt('Nom complet', type=str)
+        while not all(c.isalnum() or c.isspace() for c in full_name):
+            click.echo('Veuillez entrer un nom complet valide')
+            full_name = click.prompt('Nom complet', type=str)
+
+        email = click.prompt('Email', type=str)
+        while not is_valid_email(email):
+            click.echo('Veuillez entrer un email valide')
+            email = click.prompt('Email', type=str)
+
+        phone_number = click.prompt('Numéro de téléphone', type=str)
+        while not is_valid_phone_number(phone_number):
+            click.echo('Veuillez entrer un numéro de téléphone valide')
+            phone_number = click.prompt('Numéro de téléphone', type=str)
+
+        response = click.prompt(
+            'Voulez-vous entrer un nom d\'entreprise? (O/N)', type=str)
+        if response.upper() == 'O':
+            company_name = click.prompt('Nom de l\'entreprise', type=str)
+            while not all(c.isalnum() or c.isspace() for c in company_name):
+                click.echo(
+                    "Le nom de l'entreprise ne doit contenir que des chiffres, des lettres et des espaces.")
+                company_name = click.prompt('Nom de l\'entreprise', type=str)
+            company_name, company_id = wich_company(company_name)
+            if company_id is not None:
+                click.echo("Le client sera créé avec l'entreprise associée")
+                new_client.extend(
+                    [full_name, email, phone_number, company_name, company_id])
+            else:
+                click.echo(
+                    "Le client sera créé sans entreprise associée gkdfjgkvjfdc")
+                new_client.extend(
+                    [full_name, email, phone_number, company_name, None])
+        else:
+            click.echo("Le client sera créé sans entreprise associée")
+            new_client.extend([full_name, email, phone_number, None, None])
+
+        return new_client
 
 
 def wich_customer():
-    client_name = click.prompt("Entrez le nom du client: ")
+    client_name = click.prompt("Entrez le nom du client: ", type=str)
 
     if client_name.isalnum():
         clients_corresponding = client_dao.get_clients_by_name(client_name)
@@ -142,13 +141,27 @@ def view_update_client(client, modified):
 
             if choice == 1:
                 new_full_name = click.prompt("Entrez le nouveau nom complet: ")
+                while not all(c.isalnum() or c.isspace() for c in new_full_name):
+                    click.echo('Veuillez entrer un nom complet valide')
+                    new_full_name = click.prompt(
+                        "Entrez le nouveau nom complet: ")
                 client_data = {"full_name": new_full_name}
+
             elif choice == 2:
                 new_email = click.prompt("Entrez le nouvel email: ")
+                while not is_valid_email(new_email):
+                    click.echo('Veuillez entrer un email valide')
+                    new_email = click.prompt("Entrez le nouvel email: ")
                 client_data = {"email": new_email}
+
             elif choice == 3:
                 new_phone_number = click.prompt(
                     "Entrez le nouveau numéro de téléphone: ")
+                while not is_valid_phone_number(new_phone_number):
+                    click.echo('Veuillez entrer un numéro de téléphone valide')
+                    new_phone_number = click.prompt(
+                        "Entrez le nouveau numéro de téléphone: ")
+
                 client_data = {"phone_number": new_phone_number}
 
             elif choice == 4:
@@ -189,23 +202,14 @@ def view_update_client(client, modified):
             return False
 
 
-def view_client(client):
-    table_data = []
-
-    collaborator = collaborator_dao.get_collaborator(client.commercial_id)
-    row = [
-        client.id,
-        client.full_name,
-        client.email,
-        client.phone_number,
-        client.company,
-        client.creation_date,
-        client.last_contact_date,
-        collaborator.full_name if collaborator else "Commercial inconnu"
-    ]
-    table_data.append(row)
-
-    # Afficher le tableau
-    headers = [" ", "Nom", "Email", "Téléphone", "Nom de l'entreprise",
-               "Date de création", "Dernier contact", "Contact commercial chez Epic Event"]
-    print(tabulate(table_data, headers, tablefmt="grid"))
+def view_delete_client(client, deleted):
+    if deleted:
+        click.echo('Client supprimé avec succès')
+    else:
+        click.echo(f'Suppresion du client {client.full_name}')
+        response = click.prompt('Souhaitez-vous supprimer ce client ? (O/N)')
+        if response.upper() == 'O':
+            return True
+        else:
+            click.echo('Suppression annulée')
+            return False

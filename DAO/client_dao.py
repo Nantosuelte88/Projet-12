@@ -29,6 +29,10 @@ class ClientDAO:
     def get_clients_by_name(self, client_name):
         clients = self.session.query(Client).filter(Client.full_name.ilike(f"%{client_name}%")).all()
         return clients
+    
+    def get_clients_by_collaborator_id(self, collaborator_id):
+        clients = self.session.query(Client).filter_by(commercial_id=collaborator_id).all()
+        return clients
 
     def create_client(self, client_data):
         client = Client(**client_data)

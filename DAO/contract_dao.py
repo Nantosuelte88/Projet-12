@@ -29,6 +29,14 @@ class ContractDAO:
         contracts = self.session.query(Contract).filter_by(client_id=client_id).all()
         return contracts
 
+    def get_unpaid(self):
+        contracts = self.session.query(Contract).filter(Contract.remaining_amount > 0).all()
+        return contracts
+
+    def get_contract_unsigned(self):
+        contracts = self.session.query(Contract).filter(Contract.status == False).all()
+        return contracts
+
     def create_contract(self, contract_data):
         contract = Contract(**contract_data)
         self.session.add(contract)
