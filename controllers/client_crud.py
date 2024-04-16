@@ -6,7 +6,7 @@ from models.collaboration import Collaborator, Department
 from models.clients import Client, Contract, Event
 from datetime import datetime, timedelta, timezone
 from utils.decorators import department_permission_required
-from views.view_client import view_clients, view_create_client, wich_customer, view_update_client, view_delete_client
+from views.view_client import view_clients, view_create_client, view_wich_client, view_update_client, view_delete_client
 from utils.get_object import get_id_by_token
 from DAO.client_dao import ClientDAO
 from DAO.company_dao import CompanyDAO
@@ -29,7 +29,7 @@ def display_my_clients(token):
 
 
 def delete_client(token):
-    client = wich_customer()
+    client = wich_client()
     deleted = False
     choice = view_delete_client(client, deleted)
     if choice:
@@ -38,8 +38,14 @@ def delete_client(token):
             deleted = True
             view_delete_client(client, deleted)
 
+def last_contact_client(client_id):
+    last_contact = datetime.now(timezone.utc)
+    client = client_dao.get_client(client_id)
+    if client:
+        new_data = {'last_contact_date': last_contact}
+        client_dao.update_client(client.id, new_data)
 
-@department_permission_required(3)
+
 def create_new_client(token):
     created = False
     info_client = view_create_client(created)
@@ -75,11 +81,9 @@ def create_new_client(token):
 
 def update_client(token):
     modified = False
-    client = wich_customer()
+    client = wich_client()
     client_id = client.id
     response = view_update_client(client, modified)
-    print("1;", response)
-    print(response.get("company_id"))
     if response:
         if response.get("company_id"):
             company_id = {'company_id': response.get("company_id")}
@@ -88,7 +92,18 @@ def update_client(token):
             modified_client = client_dao.update_client(client_id, company_id)
         else:
             modified_client = client_dao.update_client(client_id, response)
-        print("2;", modified_client.company, modified_client.company_id)
         if modified_client:
             modified = True
+            last_contact_client(client_id)
             view_update_client(client, modified)
+
+def wich_client():
+    found = False
+    clients_corresponding = None
+    client_name = view_wich_client(clients_corresponding, found)
+    if client_name:
+        clients_corresponding = client_dao.get_clients_by_name(client_name)
+        if clients_corresponding:
+            found = True
+            client = view_wich_client(clients_corresponding, found)
+            return client

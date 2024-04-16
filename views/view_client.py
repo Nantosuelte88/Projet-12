@@ -94,16 +94,19 @@ def view_create_client(created):
         return new_client
 
 
-def wich_customer():
-    client_name = click.prompt("Entrez le nom du client: ", type=str)
-
-    if client_name.isalnum():
-        clients_corresponding = client_dao.get_clients_by_name(client_name)
-
+def view_wich_client(clients_corresponding, found):
+    if found :
+        click.echo('trouvé')
         if clients_corresponding:
             if len(clients_corresponding) == 1:
-                # Retourne le seul client trouvé
-                return clients_corresponding[0]
+                click.echo("Un client trouvé à ce nom")
+                click.echo(clients_corresponding[0].full_name)
+                response = click.prompt("Souhaitez-vous selectionner ce client ? (O/N)", type=str)
+                if response.upper() == 'O':
+                    return clients_corresponding[0]
+                else:
+                    click.echo('Selection annulée')
+                    return None
             else:
                 click.echo("Plusieurs clients correspondent à ce nom :")
                 for idx, client in enumerate(clients_corresponding, start=1):
@@ -119,6 +122,12 @@ def wich_customer():
         else:
             click.echo("Aucun client correspondant.")
             return None
+    else:
+        client_name = click.prompt("Entrez le nom du client: ", type=str)
+        return client_name
+
+
+
 
 
 def view_update_client(client, modified):

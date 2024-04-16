@@ -25,6 +25,10 @@ class EventDAO:
             return None
         return event
     
+    def get_events_by_name(self, event_name):
+        events = self.session.query(Event).filter(Event.name.ilike(f"%{event_name}%")).all()
+        return events
+    
     def get_event_by_contract_id(self, contract_id):
         events = self.session.query(Event).filter_by(contract_id=contract_id)
         return events

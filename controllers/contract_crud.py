@@ -6,13 +6,13 @@ from models.collaboration import Collaborator, Department
 from models.clients import Client, Contract, Event
 from datetime import datetime, timedelta, timezone
 from utils.decorators import department_permission_required
-from views.view_client import view_create_client, wich_customer, view_update_client
+from views.view_client import view_create_client, view_update_client
 from utils.get_object import get_id_by_token
 from DAO.client_dao import ClientDAO
 from DAO.company_dao import CompanyDAO
 from DAO.contract_dao import ContractDAO
-from views.view_contract import view_create_contract, wich_contract, view_update_contract, view_contracts, view_delete_contract
-
+from views.view_contract import view_create_contract, view_wich_contract, view_update_contract, view_contracts, view_delete_contract
+from controllers.client_crud import last_contact_client, wich_client
 
 session = create_db_connection()
 client_dao = ClientDAO(session)
@@ -35,10 +35,10 @@ def display_unsigned_contracts(token):
 
 
 def create_contract(token):
-    client = wich_customer()
+    client = wich_client()
+    created = False
     if client:
-        info_contract = view_create_contract(client)
-        print(info_contract)
+        info_contract = view_create_contract(client, created)
         if info_contract:
             creation_date = datetime.now(timezone.utc)
 
@@ -53,23 +53,27 @@ def create_contract(token):
             new_contract = contract_dao.create_contract(new_contract_data)
 
             if new_contract:
-                print("Nouveau contrat enregistré avec succès")
-            else:
-                print("Une erreur s'est produite")
+                created = True
+                view_create_contract(client, created)
+                last_contact_client(client.id)
+
 
 def update_contract(token):
     contract = wich_contract()
-    print(contract)
     modified = False
     client = client_dao.get_client(contract.client_id)
     new_data = view_update_contract(contract, client.full_name, modified)
     if new_data:
-        print(new_data)
         modification = contract_dao.update_contract(contract.id, new_data)
-
+        if 'client_id' in new_data:
+            client_id = new_data['client_id']
+        else:
+            client_id = client.id
         if modification:
             modified = True
             view_update_contract(contract, client, modified)
+            last_contact_client(client_id)
+
 
 def delete_contract(token):
     contract = wich_contract()
@@ -82,3 +86,12 @@ def delete_contract(token):
             if remove:
                 deleted = True
                 view_delete_contract(contract, client, deleted)
+
+
+def wich_contract():
+    client = wich_client()
+    if client:
+        contracts_corresponding = contract_dao.get_contracts_by_client_id(client.id)
+        contract = view_wich_contract(contracts_corresponding, client)
+        if contract:
+            return contract

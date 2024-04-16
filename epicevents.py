@@ -44,6 +44,12 @@ def login_command(ctx):
 
 
 @cli.command()
+@click.option('--nom', prompt='ton nom:')
+def print_nom(nom):
+    print(nom)
+
+
+@cli.command()
 @click.pass_context
 def prints_test(ctx):
     token = ctx.obj["token"]

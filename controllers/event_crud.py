@@ -2,11 +2,10 @@
 from connect_database import create_db_connection
 from utils.decorators import department_permission_required
 from utils.get_object import get_id_by_token
-from views.view_client import view_create_client, wich_customer, view_update_client
+from views.view_client import view_create_client, view_update_client
 from DAO.client_dao import ClientDAO
 from DAO.contract_dao import ContractDAO
-from views.view_contract import view_create_contract, wich_contract, view_update_contract
-from views.view_client import wich_customer
+from views.view_contract import view_create_contract, view_wich_contract, view_update_contract
 from views.login import login
 from DAO.collaborator_dao import CollaboratorDAO
 from DAO.client_dao import ClientDAO
@@ -14,7 +13,9 @@ from DAO.contract_dao import ContractDAO
 from DAO.event_dao import EventDAO
 from connect_database import create_db_connection
 from tabulate import tabulate
-from views.view_event import view_events, view_create_event, view_update_event, wich_event, view_delete_event, view_no_event_with_contract_unsigned
+from views.view_event import view_events, view_create_event, view_update_event, view_search_event_by_name_or_client, view_delete_event, view_no_event_with_contract_unsigned, view_wich_event
+from controllers.client_crud import last_contact_client, wich_client
+from controllers.contract_crud import wich_contract
 
 session = create_db_connection()
 client_dao = ClientDAO(session)
@@ -23,7 +24,7 @@ contract_dao = ContractDAO(session)
 event_dao = EventDAO(session)
 
 
-def display_all_events():
+def display_all_events(token):
     events = event_dao.get_all_events()
     view_events(events)
 
@@ -67,49 +68,78 @@ def create_event(token):
                 new_event = event_dao.create_event(new_event_data)
                 if new_event:
                     created = True
+                    last_contact_client(client_id)
                     view_create_event(client, contract, created)
             else:
                 view_no_event_with_contract_unsigned(client, contract)
 
 
 def update_event(token):
-    client = wich_customer()
-    contracts = contract_dao.get_contracts_by_client_id(client.id)
-    events = []
-    if contracts:
-        for contract in contracts:
-            event = event_dao.get_event_by_contract_id(contract.id).all()
-            events.extend(event)
-    event = wich_event(events, client.full_name)
-    print("yup", event)
-
+    event = wich_event()
     if event:
-        modified = False
-        new_data = view_update_event(event, client.full_name, modified)
-        if new_data:
-            print(new_data)
-            modification = event_dao.update_event(event.id, new_data)
+        contract = contract_dao.get_contract(event.contract_id)
+        if contract:
+            client = client_dao.get_client(contract.client_id)
+            if client:
+                modified = False
+                new_data = view_update_event(event, client.full_name, modified)
+                if new_data:
+                    if 'client_id' in new_data:
+                        client_id = new_data['client_id']
+                        modification = contract_dao.update_contract(event.contract_id, new_data)
+                    else:
+                        modification = event_dao.update_event(event.id, new_data)
+                        client_id = client.id
 
-            if modification:
-                modified = True
-                view_update_event(event, client.full_name, modified)
+                    if modification:
+                        modified = True
+                        view_update_event(event, client.full_name, modified)
+                        last_contact_client(client_id)
+
 
 
 def delete_event(token):
-    client = wich_customer()
-    contracts = contract_dao.get_contracts_by_client_id(client.id)
-    events = []
-    if contracts:
-        for contract in contracts:
-            event = event_dao.get_event_by_contract_id(contract.id).all()
-            events.extend(event)
-    event = wich_event(events, client.full_name)
+    event = wich_event()
+    contract = contract_dao.get_contract(event.contract_id)
+    if contract:
+        client = client_dao.get_client(contract.client_id)
+        if client:
+            if event:
+                deleted = False
+                response = view_delete_event(event, client, deleted)
+                if response:
+                    remove = event_dao.delete_event(event.id)
+                    if remove:
+                        deleted = True
+                        view_delete_event(event, client, deleted)
 
-    if event:
-        deleted = False
-        response = view_delete_event(event, client, deleted)
-        if response:
-            remove = event_dao.delete_event(event.id)
-            if remove:
-                deleted = True
-                view_delete_event(event, client, deleted)
+
+def get_events_by_client(client):
+    if client:
+        contracts = contract_dao.get_contracts_by_client_id(client.id)
+        events = []
+        if contracts:
+            for contract in contracts:
+                event = event_dao.get_event_by_contract_id(contract.id).all()
+                events.extend(event)
+        return events
+
+
+def wich_event():
+    response = view_search_event_by_name_or_client()
+    if response:
+        if 'client_name' in response:
+            client = wich_client()
+            if client:
+                events = get_events_by_client(client)
+        elif 'name' in response:
+            event_name = response['name']
+            if event_name:
+                events = event_dao.get_events_by_name(event_name)
+        
+        event = view_wich_event(events)
+        if event:
+            return event
+    
+    else:
+        return None

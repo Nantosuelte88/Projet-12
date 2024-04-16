@@ -11,7 +11,8 @@ collaborator_dao = CollaboratorDAO(session)
 department_dao = DepartmentDAO(session)
 
 def create_collaborator(token):
-    info_collaborator = view_create_collaborator()
+    created = False
+    info_collaborator = view_create_collaborator(created)
     if info_collaborator:
         password = info_collaborator[2]
         salt = bcrypt.gensalt()
@@ -27,9 +28,8 @@ def create_collaborator(token):
         new_collaborator = collaborator_dao.create_collaborator(new_collaborator_data)
 
         if new_collaborator:
-            print('Nouveau collaborateur ajouté')
-        else:
-            print("Une erreur s'est produite.")
+            created = True
+            view_create_collaborator(created)
 
 
 def update_collaborator(token):

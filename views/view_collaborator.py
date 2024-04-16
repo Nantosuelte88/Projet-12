@@ -39,48 +39,51 @@ def wich_collaborator():
             click.echo('Aucun collaborateur trouvé.')
 
 
-def view_create_collaborator():
+def view_create_collaborator(created):
     """
     Créer un nouveau collaborateur
     """
-    click.echo("Création d'un nouveau collaborateur :")
-
-    new_collaborator = []
-    departments = department_dao.get_all_departments()
-
-    if departments:
-
-        full_name = click.prompt('Nom complet', type=str)
-        while not all(c.isalnum() or c.isspace() for c in full_name):
-            click.echo('Veuillez entrer un nom complet valide')
-            full_name = click.prompt('Nom complet', type=str)
-        new_collaborator.append(full_name)
-
-        email = click.prompt('Email', type=str)
-        while not is_valid_email(email):
-            click.echo('Veuillez entrer un email valide')
-            email = click.prompt('Email', type=str)
-        new_collaborator.append(email)
-
-        password = click.prompt('Mot de passe', hide_input=True, type=str)
-        while not is_valid_password(password):
-            click.echo('Veuillez entrer un mot de passe valide - A MODIFIER')
-            password = click.prompt('Mot de passe', type=str)
-        new_collaborator.append(password)
-        
-        click.echo('Choisissez un departement à associer :')
-        for idx, department in enumerate(departments, start=1):
-            click.echo(f"{idx}. {department.name}")    
-        selected_department = click.prompt("Sélectionner lu numéro de departement", type=int)
-        while not selected_department <=3:
-            click.echo('Veuillez selectionner un numéro valide.')
-            selected_department = click.prompt("Sélectionner lu numéro de departement", type=int)
-        new_collaborator.append(selected_department)
-
-        return new_collaborator
-
+    if created:
+        click.echo('Nouveau collaborateur ajouté avce succès')
     else:
-        click.echo("Une erreur s'est produite.")
+        click.echo("Création d'un nouveau collaborateur :")
+
+        new_collaborator = []
+        departments = department_dao.get_all_departments()
+
+        if departments:
+
+            full_name = click.prompt('Nom complet', type=str)
+            while not all(c.isalnum() or c.isspace() for c in full_name):
+                click.echo('Veuillez entrer un nom complet valide')
+                full_name = click.prompt('Nom complet', type=str)
+            new_collaborator.append(full_name)
+
+            email = click.prompt('Email', type=str)
+            while not is_valid_email(email):
+                click.echo('Veuillez entrer un email valide')
+                email = click.prompt('Email', type=str)
+            new_collaborator.append(email)
+
+            password = click.prompt('Mot de passe', hide_input=True, type=str)
+            while not is_valid_password(password):
+                click.echo('Veuillez entrer un mot de passe valide - A MODIFIER')
+                password = click.prompt('Mot de passe', type=str)
+            new_collaborator.append(password)
+            
+            click.echo('Choisissez un departement à associer :')
+            for idx, department in enumerate(departments, start=1):
+                click.echo(f"{idx}. {department.name}")    
+            selected_department = click.prompt("Sélectionner lu numéro de departement", type=int)
+            while not selected_department <=3:
+                click.echo('Veuillez selectionner un numéro valide.')
+                selected_department = click.prompt("Sélectionner lu numéro de departement", type=int)
+            new_collaborator.append(selected_department)
+
+            return new_collaborator
+
+        else:
+            click.echo("Une erreur s'est produite.")
 
 
 def view_update_collaborator(collaborator, modified):

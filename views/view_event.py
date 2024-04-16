@@ -4,8 +4,9 @@ from utils.decorators import department_permission_required
 from utils.input_validators import is_valid_date_format
 from DAO.client_dao import ClientDAO
 from DAO.contract_dao import ContractDAO
-from views.view_departments import wich_collaborator_in_department
+from controllers.department_crud import wich_collaborator_in_department
 from views.login import login
+from controllers.client_crud import wich_client
 from DAO.collaborator_dao import CollaboratorDAO
 from DAO.client_dao import ClientDAO
 from DAO.contract_dao import ContractDAO
@@ -130,9 +131,24 @@ def view_create_event(client, contract, created):
         return new_event
 
 
-def wich_event(events, client_name):
+def view_search_event_by_name_or_client():
+    click.echo('Souhaitez-vous retrouver l\'événement par son nom ou par son client ?')
+    click.echo('1: Son nom')
+    click.echo('2: Son client')
+    choice = click.prompt('Entrez le numéro correspondant', type=int)
+    if choice == 1:
+        event_name = click.prompt('Quel est le nom de l\'événement? ', type=str)
+        if event_name:
+            return {'name': event_name}
+    if choice == 2:
+        return {'client_name'}
+    else:
+        click.echo('Demande invalide')
+
+
+def view_wich_event(events):
     if events:
-        click.echo(f"Evénement.s trouvé.s pour le client {client_name}:")
+        click.echo(f"Evénement.s trouvé.s :")
         for idx, event in enumerate(events, start=1):
             click.echo(f"{idx}. Nom de l\'événement {event.name}")
 
@@ -144,8 +160,10 @@ def wich_event(events, client_name):
             return selected_event
         else:
             click.echo("Numéro d\événement invalide.")
+            return None
     else:
         click.echo("Aucun événement trouvé pour ce client")
+        return None
 
 
 def view_update_event(event, client_name, modified):
@@ -169,6 +187,7 @@ def view_update_event(event, client_name, modified):
         click.echo(f"5: Le lieu de l\'événement : {event.location}")
         click.echo(f"6: Le nombre de convives attendues : {event.attendees}")
         click.echo(f"7: Les commentaires : {event.notes}")
+        click.echo(f"8 : Le client associé : {client_name}")
 
         choice = click.prompt(
             "Entrez le numéro correspondant à votre choix: ", type=int)
@@ -232,6 +251,17 @@ def view_update_event(event, client_name, modified):
                 new_notes = click.prompt('Commentaire ', type=str)
 
             event_data = {'notes': new_notes}
+
+        elif choice == 8:
+            new_client = wich_client()
+            if new_client:
+                click.echo(f'Le client {client_name} va être remplacé par le client {new_client.full_name} pour l\'événement ~ {event.name} ~')
+                response = click.prompt('Confirmez-vous cette modification ? (O/N) ', type=str)
+                if response.upper() == 'O':
+                    contract_data = {'client_id': new_client.id}
+                    return contract_data
+                else:
+                    click.echo('Modification annulée.')
 
         else:
             click.echo("Choix invalide.")

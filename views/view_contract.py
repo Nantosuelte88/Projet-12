@@ -9,7 +9,7 @@ from connect_database import create_db_connection
 from sqlalchemy.orm import sessionmaker
 from tabulate import tabulate
 from utils.decorators import department_permission_required
-from views.view_client import wich_customer
+from controllers.client_crud import wich_client
 from utils.input_validators import is_valid_money_format
 
 session = create_db_connection()
@@ -20,7 +20,6 @@ event_dao = EventDAO(session)
 
 
 def view_contracts(contracts):
-
     if contracts:
         # Préparer les données pour le tableau
         table_data = []
@@ -43,67 +42,63 @@ def view_contracts(contracts):
     else:
         print("Aucun contrat à afficher")
 
-def view_create_contract(client):
+def view_create_contract(client, created):
     """
     Création d'un nouveau contrat
     """
-
-    click.echo(f"Création d\'un nouveau contrat pour le client {client.full_name}")
-
-    new_contract = []
-
-    total_amount = click.prompt('Montant total', type=str)
-    while not is_valid_money_format(total_amount):
-        click.echo('Veuillez entrer une somme valide')
-        total_amount = click.prompt('Montant total', type=str)
-    new_contract.append(total_amount)
-
-    remaining_amount = click.prompt('Reste à payer', type=str)
-    while not is_valid_money_format(remaining_amount):
-        click.echo('Veuillez entrer un somme valide')
-        remaining_amount = click.prompt( 'Reste à payer', type=str)
-    new_contract.append(remaining_amount)    
-
-    status = click.prompt('Le contrat est-il signé? (O/N)', type=str)
-    while status.upper() != 'O' and status.upper() != 'N':
-        click.echo('Veuillez répondre par "O" pour Oui et "N" pour Non')
-        status = click.prompt('Le contrat est-il signé? (O/N)', type=str)
-    if status.upper() == 'O':
-        status = True
-    elif status.upper() == 'N':
-        status = False
-    new_contract.append(status)
-
-    return new_contract
-
-def wich_contract():
-    client = wich_customer()
-
-    if client:
-        contracts = contract_dao.get_contracts_by_client_id(client.id)
-        
-        if contracts:
-            click.echo(f"Contrat.s trouvé.s pour le client {client.full_name}:")
-            for idx, contract in enumerate(contracts, start=1):
-                click.echo(f"{idx}. ID du contrat : {contract.id}")
-                click.echo(f"  - Mon total du contrat : {contract.total_amount}")
-                if contract.status is True:
-                    click.echo(f"  - Contrat signé")
-                else:
-                    click.echo("  - Contrat non signé")
-
-           
-            selected_idx = click.prompt("Sélectionner le numéro du contrat ", type=int)
-            
-            if 1 <= selected_idx <= len(contracts):
-                selected_contract = contracts[selected_idx - 1]
-                return selected_contract
-            else:
-                click.echo("Numéro de contrat invalide.")
-        else:
-            click.echo("Aucun contrat trouvé pour ce client.")
+    if created:
+        click.echo('Nouveau contrat enregistré avec succès')
     else:
-        click.echo("Aucun client correspondant.")
+
+        click.echo(f"Création d\'un nouveau contrat pour le client {client.full_name}")
+
+        new_contract = []
+
+        total_amount = click.prompt('Montant total', type=str)
+        while not is_valid_money_format(total_amount):
+            click.echo('Veuillez entrer une somme valide')
+            total_amount = click.prompt('Montant total', type=str)
+        new_contract.append(total_amount)
+
+        remaining_amount = click.prompt('Reste à payer', type=str)
+        while not is_valid_money_format(remaining_amount):
+            click.echo('Veuillez entrer un somme valide')
+            remaining_amount = click.prompt( 'Reste à payer', type=str)
+        new_contract.append(remaining_amount)    
+
+        status = click.prompt('Le contrat est-il signé? (O/N)', type=str)
+        while status.upper() != 'O' and status.upper() != 'N':
+            click.echo('Veuillez répondre par "O" pour Oui et "N" pour Non')
+            status = click.prompt('Le contrat est-il signé? (O/N)', type=str)
+        if status.upper() == 'O':
+            status = True
+        elif status.upper() == 'N':
+            status = False
+        new_contract.append(status)
+
+        return new_contract
+
+def view_wich_contract(contracts, client):
+    if contracts:
+        click.echo(f"Contrat.s trouvé.s pour le client {client.full_name}:")
+        for idx, contract in enumerate(contracts, start=1):
+            click.echo(f"{idx}. ID du contrat : {contract.id}")
+            click.echo(f"  - Mon total du contrat : {contract.total_amount}")
+            if contract.status is True:
+                click.echo("  - Contrat signé")
+            else:
+                click.echo("  - Contrat non signé")
+
+        
+        selected_idx = click.prompt("Sélectionner le numéro du contrat ", type=int)
+        
+        if 1 <= selected_idx <= len(contracts):
+            selected_contract = contracts[selected_idx - 1]
+            return selected_contract
+        else:
+            click.echo("Numéro de contrat invalide.")
+    else:
+        click.echo("Aucun contrat trouvé pour ce client.")
 
 def view_update_contract(contract, client_name, modified):
 
@@ -118,7 +113,8 @@ def view_update_contract(contract, client_name, modified):
             click.echo(f"3: le status du contrat : Contrat signé")
         else:
             click.echo(f"3: le status du contrat : Contrat non signé")
-
+        click.echo(f'4: Le client associé :  {client_name}')
+ 
         choice = click.prompt("Entrez le numéro correspondant à votre choix: ", type=int)
 
         if choice == 1:
@@ -147,6 +143,16 @@ def view_update_contract(contract, client_name, modified):
             elif new_status.upper() == 'N':
                 new_status = False
             contract_data = {'status': new_status}
+        
+        elif choice == 4:
+            new_client = wich_client() 
+            if new_client:
+                click.echo(f'Le client {client_name} va être remplacé par le client {new_client.full_name} pour le contrat n° {contract.id}')
+                response = click.prompt('Confirmez-vous cette modification ? (O/N) ', type=str)
+                if response.upper() == 'O':
+                    contract_data = {'client_id': new_client.id}
+                else:
+                    click.echo('Modification annulée.')
         
         else:
             click.echo("Choix invalide.")
