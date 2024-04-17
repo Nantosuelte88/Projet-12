@@ -10,33 +10,58 @@ from views.view_client import view_clients, view_create_client, view_wich_client
 from utils.get_object import get_id_by_token
 from DAO.client_dao import ClientDAO
 from DAO.company_dao import CompanyDAO
+from DAO.contract_dao import ContractDAO
+from DAO.event_dao import EventDAO
+from DAO.collaborator_dao import CollaboratorDAO
 
 session = create_db_connection()
 client_dao = ClientDAO(session)
 company_dao = CompanyDAO(session)
+contract_dao =ContractDAO(session)
+event_dao = EventDAO(session)
+collaborator_dao = CollaboratorDAO(session)
 
 
 def display_all_clients(token):
     # Récupérer tous les clients de la base de données
     clients = client_dao.get_all_clients()
-    view_clients(clients)
+    if clients:
+        collaborators = []
+        for client in clients:
+            if client.commercial_id:
+                collaborator = collaborator_dao.get_collaborator(client.commercial_id)
+            else:
+                collaborator = "Pas de collaborateur associé"
+            collaborators.append(collaborator)
+    view_clients(clients, collaborators)
 
 
 def display_my_clients(token):
+    collaborators = []
     collaborator_id = get_id_by_token(token)
+
     clients = client_dao.get_clients_by_collaborator_id(collaborator_id)
-    view_clients(clients)
+    if clients:
+        collaborators = []
+        for client in clients:
+            if client.commercial_id:
+                collaborator = collaborator_dao.get_collaborator(client.commercial_id)
+            else:
+                collaborator = "Pas de collaborateur associé"
+            collaborators.append(collaborator)
+    view_clients(clients, collaborators)
 
 
 def delete_client(token):
     client = wich_client()
     deleted = False
-    choice = view_delete_client(client, deleted)
+    contracts_clients = contract_dao.get_contracts_by_client_id(client.id)
+    choice = view_delete_client(client, deleted, contracts_clients)
     if choice:
         remove = client_dao.delete_client(client.id)
         if remove:
             deleted = True
-            view_delete_client(client, deleted)
+            view_delete_client(client, deleted, contracts_clients)
 
 def last_contact_client(client_id):
     last_contact = datetime.now(timezone.utc)
@@ -106,4 +131,5 @@ def wich_client():
         if clients_corresponding:
             found = True
             client = view_wich_client(clients_corresponding, found)
-            return client
+            if client:
+                return client

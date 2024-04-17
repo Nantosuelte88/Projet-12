@@ -18,8 +18,10 @@ company_dao = CompanyDAO(session)
 
 
 def create_company(company_name):
+    matching_companies = company_dao.get_corresponding_company(company_name)
+
     if company_name:
-        company_data = view_create_company(company_name)
+        company_data = view_create_company(company_name, matching_companies)
         print(company_data)
         
         # Création de l'entreprise

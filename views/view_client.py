@@ -2,26 +2,17 @@ import click
 from connect_database import create_db_connection
 from tabulate import tabulate
 from utils.input_validators import is_valid_email, is_valid_phone_number
-from DAO.client_dao import ClientDAO
-from DAO.collaborator_dao import CollaboratorDAO
 from tabulate import tabulate
 from controllers.company_crud import create_company
 from views.view_company import wich_company
 from utils.decorators import department_permission_required
 
 
-session = create_db_connection()
-collaborator_dao = CollaboratorDAO(session)
-client_dao = ClientDAO(session)
-
-
-def view_clients(clients):
+def view_clients(clients, collaborators):
     if clients:
         # Préparer les données pour le tableau
         table_data = []
-        for client in clients:
-            collaborator = collaborator_dao.get_collaborator(
-                client.commercial_id)
+        for client, collaborator in zip(clients, collaborators):
             row = [
                 client.id,
                 client.full_name,
@@ -95,13 +86,13 @@ def view_create_client(created):
 
 
 def view_wich_client(clients_corresponding, found):
-    if found :
-        click.echo('trouvé')
+    if found:
         if clients_corresponding:
             if len(clients_corresponding) == 1:
                 click.echo("Un client trouvé à ce nom")
                 click.echo(clients_corresponding[0].full_name)
-                response = click.prompt("Souhaitez-vous selectionner ce client ? (O/N)", type=str)
+                response = click.prompt(
+                    "Souhaitez-vous selectionner ce client ? (O/N)", type=str)
                 if response.upper() == 'O':
                     return clients_corresponding[0]
                 else:
@@ -125,9 +116,6 @@ def view_wich_client(clients_corresponding, found):
     else:
         client_name = click.prompt("Entrez le nom du client: ", type=str)
         return client_name
-
-
-
 
 
 def view_update_client(client, modified):
@@ -211,9 +199,12 @@ def view_update_client(client, modified):
             return False
 
 
-def view_delete_client(client, deleted):
+def view_delete_client(client, deleted, contracts):
     if deleted:
         click.echo('Client supprimé avec succès')
+    elif contracts:
+        click.echo(
+            'Au moins un contrat est associé à ce client, vous  ne pouvez pas le supprimer actuellement')
     else:
         click.echo(f'Suppresion du client {client.full_name}')
         response = click.prompt('Souhaitez-vous supprimer ce client ? (O/N)')

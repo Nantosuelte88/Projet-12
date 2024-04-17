@@ -2,15 +2,9 @@ import click
 from connect_database import create_db_connection
 from utils.decorators import department_permission_required
 from utils.input_validators import is_valid_date_format
-from DAO.client_dao import ClientDAO
-from DAO.contract_dao import ContractDAO
 from controllers.department_crud import wich_collaborator_in_department
 from views.login import login
 from controllers.client_crud import wich_client
-from DAO.collaborator_dao import CollaboratorDAO
-from DAO.client_dao import ClientDAO
-from DAO.contract_dao import ContractDAO
-from DAO.event_dao import EventDAO
 from connect_database import create_db_connection
 from tabulate import tabulate
 from utils.decorators import department_permission_required
@@ -20,36 +14,18 @@ GESTION = 2
 SUPPORT = 1
 
 
-session = create_db_connection()
-client_dao = ClientDAO(session)
-collaborator_dao = CollaboratorDAO(session)
-contract_dao = ContractDAO(session)
-event_dao = EventDAO(session)
-
-
-def view_events(events):
+def view_events(events, clients, supports):
     if events:
         table_data = []
 
-        for event in events:
-            contract = contract_dao.get_contract(event.contract_id)
-            if contract:
-                client = client_dao.get_client(contract.client_id)
-
-            if event.support_id:
-                support_obj = collaborator_dao.get_collaborator(
-                    event.support_id)
-                support = support_obj.full_name
-            else:
-                support = "Pas de collaborateur associé"
+        for event, client, support in zip(events, clients, supports):
 
             row = [
                 event.id,
                 event.name,
                 event.contract_id,
                 client.full_name if client else "Client inconnu",
-                f"{client.phone_number}\n{
-                    client.email}" if client else "Client inconnu",
+                f"{client.phone_number}\n{client.email}" if client else "Client inconnu",
                 event.date_start,
                 event.date_end,
                 support,
@@ -166,28 +142,35 @@ def view_wich_event(events):
         return None
 
 
+def view_update_support_in_event(event, support, modified):
+    if modified:
+        click.echo("Evenement modifié avec succès")
+    else:
+        if support:
+            click.echo(f"Modifcation du collaborateur {support.full_name} pour l'événement ~ {event.name} ~ ")
+        else:
+            click.echo(f"Ajout d'un collaborateur pour l'événement ~ {event.name} ~ ")
+
+        collaborator_id = wich_collaborator_in_department(SUPPORT)
+        if collaborator_id:
+            event_data = {'support_id': collaborator_id}
+            if event_data:
+                return event_data
+
 def view_update_event(event, client_name, modified):
     if modified:
         click.echo("Evenement modifié avec succès")
 
     else:
-        if event.support_id:
-            collaborator_obj = collaborator_dao.get_collaborator(
-                event.support_id)
-            collaborator = collaborator_obj.full_name
-        else:
-            collaborator = "Actuellement vide"
-
         click.echo(
             f"Que souhaitez-vous modifier dans l'événement ~ {event.name} ~ de {client_name}")
         click.echo(f"1: Le nom : {event.name}")
         click.echo(f"2: La date de début : {event.date_start}")
         click.echo(f"3: La date de fin : {event.date_end}")
-        click.echo(f"4: Le collaborateur du support associé : {collaborator}")
-        click.echo(f"5: Le lieu de l\'événement : {event.location}")
-        click.echo(f"6: Le nombre de convives attendues : {event.attendees}")
-        click.echo(f"7: Les commentaires : {event.notes}")
-        click.echo(f"8 : Le client associé : {client_name}")
+        click.echo(f"4: Le lieu de l\'événement : {event.location}")
+        click.echo(f"5: Le nombre de convives attendues : {event.attendees}")
+        click.echo(f"6: Les commentaires : {event.notes}")
+        click.echo(f"7: Le client associé : {client_name}")
 
         choice = click.prompt(
             "Entrez le numéro correspondant à votre choix: ", type=int)
@@ -225,11 +208,6 @@ def view_update_event(event, client_name, modified):
             event_data = {'date_end': new_date_end}
 
         elif choice == 4:
-            collaborator_id = wich_collaborator_in_department(SUPPORT)
-            if collaborator_id:
-                event_data = {'support_id': collaborator_id}
-
-        elif choice == 5:
             new_location = click.prompt(
                 'Entrez le nouveau nom lieu de l\'événement', type=str)
             while not all(c.isalnum() or c.isspace() for c in new_location):
@@ -239,12 +217,12 @@ def view_update_event(event, client_name, modified):
 
             event_data = {'location': new_location}
 
-        elif choice == 6:
+        elif choice == 5:
             new_attendees = click.prompt(
                 'Entrez le nouveau nombre de convives attendues', type=int)
             event_data = {'attendees': new_attendees}
 
-        elif choice == 7:
+        elif choice == 6:
             new_notes = click.prompt('Commentaire ', type=str)
             while not all(c.isalnum() or c.isspace() for c in new_notes):
                 click.echo('Veuillez entrer une donnée valide')
@@ -252,7 +230,7 @@ def view_update_event(event, client_name, modified):
 
             event_data = {'notes': new_notes}
 
-        elif choice == 8:
+        elif choice == 7:
             new_client = wich_client()
             if new_client:
                 click.echo(f'Le client {client_name} va être remplacé par le client {new_client.full_name} pour l\'événement ~ {event.name} ~')

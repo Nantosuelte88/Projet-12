@@ -9,29 +9,49 @@ from utils.decorators import department_permission_required
 from views.view_client import view_create_client, view_update_client
 from utils.get_object import get_id_by_token
 from DAO.client_dao import ClientDAO
-from DAO.company_dao import CompanyDAO
 from DAO.contract_dao import ContractDAO
+from DAO.event_dao import EventDAO
 from views.view_contract import view_create_contract, view_wich_contract, view_update_contract, view_contracts, view_delete_contract
 from controllers.client_crud import last_contact_client, wich_client
 
 session = create_db_connection()
 client_dao = ClientDAO(session)
-company_dao = CompanyDAO(session)
 contract_dao = ContractDAO(session)
+event_dao = EventDAO(session)
+
 
 def display_all_contracts(token):
     # Récupérer tous les contrats de la base de données
     contracts = contract_dao.get_all_contracts()
-    view_contracts(contracts)
+    clients = []
+    if contracts:
+        for contract in contracts:
+            client = client_dao.get_client(contract.client_id)
+            clients.append(client)
+
+    view_contracts(contracts, clients)
 
 
 def display_contracts_unpaid(token):
     contracts = contract_dao.get_unpaid()
-    view_contracts(contracts)
+    clients = []
+    if contracts:
+        for contract in contracts:
+            client = client_dao.get_client(contract.client_id)
+            clients.append(client)
+
+    view_contracts(contracts, clients)
+
 
 def display_unsigned_contracts(token):
     contracts = contract_dao.get_contract_unsigned()
-    view_contracts(contracts)
+    clients = []
+    if contracts:
+        for contract in contracts:
+            client = client_dao.get_client(contract.client_id)
+            clients.append(client)
+
+    view_contracts(contracts, clients)
 
 
 def create_contract(token):
@@ -42,7 +62,7 @@ def create_contract(token):
         if info_contract:
             creation_date = datetime.now(timezone.utc)
 
-            new_contract_data ={
+            new_contract_data = {
                 'client_id': client.id,
                 'total_amount': info_contract[0],
                 'remaining_amount': info_contract[1],
@@ -80,18 +100,22 @@ def delete_contract(token):
     if contract:
         deleted = False
         client = client_dao.get_client(contract.client_id)
-        response = view_delete_contract(contract, client, deleted)
+        events_client = event_dao.get_event_by_contract_id(contract.id)
+        response = view_delete_contract(
+            contract, client, deleted, events_client)
         if response:
-            remove =contract_dao.delete_contract(contract.id)
+            remove = contract_dao.delete_contract(contract.id)
             if remove:
                 deleted = True
-                view_delete_contract(contract, client, deleted)
+                view_delete_contract(contract, client, deleted, events_client)
+                last_contact_client(client.id)
 
 
 def wich_contract():
     client = wich_client()
     if client:
-        contracts_corresponding = contract_dao.get_contracts_by_client_id(client.id)
+        contracts_corresponding = contract_dao.get_contracts_by_client_id(
+            client.id)
         contract = view_wich_contract(contracts_corresponding, client)
         if contract:
             return contract

@@ -2,15 +2,6 @@ import click
 from connect_database import create_db_connection
 from tabulate import tabulate
 from utils.input_validators import is_valid_email, is_valid_phone_number, is_valid_password
-from DAO.client_dao import ClientDAO
-from DAO.collaborator_dao import CollaboratorDAO
-from DAO.department_dao import DepartmentDAO
-
-session = create_db_connection()
-collaborator_dao = CollaboratorDAO(session)
-client_dao = ClientDAO(session)
-department_dao = DepartmentDAO(session)
-
 
 
 def view_wich_collaborator_in_department(collaborators_corresponding, department_id, found):

@@ -2,44 +2,43 @@ import click
 from connect_database import create_db_connection
 from tabulate import tabulate
 from utils.input_validators import is_valid_email, is_valid_phone_number, is_valid_password
-from DAO.client_dao import ClientDAO
-from DAO.collaborator_dao import CollaboratorDAO
-from DAO.department_dao import DepartmentDAO
-
-session = create_db_connection()
-collaborator_dao = CollaboratorDAO(session)
-client_dao = ClientDAO(session)
-department_dao = DepartmentDAO(session)
 
 
-def wich_collaborator():
-    collaborator_name = click.prompt("Entrez le nom du collaborateur: ", type=str)
-    
-    if collaborator_name.isalnum():
-        collaborators_corresponding = collaborator_dao.get_corresponding_collaborator(collaborator_name)
-
+def view_wich_collaborator(collaborators_corresponding, found):
+    if found:
         if collaborators_corresponding:
             if len(collaborators_corresponding) == 1:
-                # Retourne le seul collaborateur trouvé
-                return collaborators_corresponding[0]
+                click.echo("Un collaborateur trouvé à ce nom")
+                click.echo(collaborators_corresponding[0].full_name)
+                response = click.prompt("Souhaitez-vous selectionner ce collaborateur ? (O/N)", type=str)
+                if response.upper() == 'O':
+                    return collaborators_corresponding[0]
+                else:
+                    click.echo('Selection annulée')
+                    return None
             
             else:
                 click.echo('Plusieurs collaborateurs correspondent à ce nom:')
                 for idx, collaborator in enumerate(collaborators_corresponding, start=1):
                     click.echo(f"{idx}. {collaborator.full_name}")
                 
-                selected_idx = click.prompt("Entrez le numéro du collaborateur: ", type=str)
+                selected_idx = click.prompt("Entrez le numéro du collaborateur: ", type=int)
                 if 1 <= selected_idx <= len(collaborators_corresponding):
                     return collaborators_corresponding[selected_idx - 1]
                 else:
-                    click.echo("Numéro de client invalide.")
+                    click.echo("Numéro de collaborateur invalide.")
                     return None
         
         else:
             click.echo('Aucun collaborateur trouvé.')
 
+    else:
+        collaborator_name = click.prompt("Entrez le nom du collaborateur: ", type=str)
+        return collaborator_name
+         
 
-def view_create_collaborator(created):
+
+def view_create_collaborator(created, departments):
     """
     Créer un nouveau collaborateur
     """
@@ -49,7 +48,6 @@ def view_create_collaborator(created):
         click.echo("Création d'un nouveau collaborateur :")
 
         new_collaborator = []
-        departments = department_dao.get_all_departments()
 
         if departments:
 
@@ -86,13 +84,11 @@ def view_create_collaborator(created):
             click.echo("Une erreur s'est produite.")
 
 
-def view_update_collaborator(collaborator, modified):
+def view_update_collaborator(collaborator, modified, departments):
     if modified:
         click.echo("Collaborateur modifié avec succès")
 
     else:
-        departments = department_dao.get_all_departments()
-
         response = click.prompt(f"Souhaitez-vous modifier {collaborator.full_name} ? (O/N)")
 
         if response.upper() == "O":

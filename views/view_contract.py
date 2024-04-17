@@ -1,10 +1,6 @@
 import click
 from controllers.auth_permissions import authenticate, authorize
 from views.login import login
-from DAO.collaborator_dao import CollaboratorDAO
-from DAO.client_dao import ClientDAO
-from DAO.contract_dao import ContractDAO
-from DAO.event_dao import EventDAO
 from connect_database import create_db_connection
 from sqlalchemy.orm import sessionmaker
 from tabulate import tabulate
@@ -12,20 +8,13 @@ from utils.decorators import department_permission_required
 from controllers.client_crud import wich_client
 from utils.input_validators import is_valid_money_format
 
-session = create_db_connection()
-client_dao = ClientDAO(session)
-collaborator_dao = CollaboratorDAO(session)
-contract_dao = ContractDAO(session)
-event_dao = EventDAO(session)
 
-
-def view_contracts(contracts):
+def view_contracts(contracts, clients):
     if contracts:
         # Préparer les données pour le tableau
         table_data = []
         # Afficher les informations des contrats
-        for contract in contracts:
-            client = client_dao.get_client(contract.client_id)
+        for contract, client in zip(contracts, clients):
             row = [
                 contract.id,
                 client.full_name if client else "Client inconnu",
@@ -160,9 +149,11 @@ def view_update_contract(contract, client_name, modified):
 
         return contract_data
         
-def view_delete_contract(contract, client, deleted):
+def view_delete_contract(contract, client, deleted, events):
     if deleted:
         click.echo('Contrat supprimé avec succès')
+    elif events:
+        click.echo('Un événement est associé à ce contrat, vous ne pouvez pas le supprimer actuellement')
     else:
         click.echo(f'Suppresion du contrat de {client.full_name}, d\'un montant de {contract.total_amount}')
         response = click.prompt('Souhaitez-vous supprimer ce contrat ? (O/N)')

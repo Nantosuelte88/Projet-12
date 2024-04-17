@@ -3,18 +3,9 @@ from connect_database import create_db_connection
 from sqlalchemy.orm import sessionmaker
 from tabulate import tabulate
 from utils.input_validators import is_valid_phone_number
-from DAO.client_dao import ClientDAO
-from DAO.collaborator_dao import CollaboratorDAO
-from DAO.company_dao import CompanyDAO
 from tabulate import tabulate
 
-session = create_db_connection()
-collaborator_dao = CollaboratorDAO(session)
-client_dao = ClientDAO(session)
-company_dao = CompanyDAO(session)
-
-def wich_company(company_name):
-    matching_companies = company_dao.get_corresponding_company(company_name)
+def wich_company(company_name, matching_companies):
     if matching_companies:
         click.echo('Entreprises correspondante.s trouvée.s :')
         if len(matching_companies) == 1:

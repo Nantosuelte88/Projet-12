@@ -13,7 +13,7 @@ from DAO.contract_dao import ContractDAO
 from DAO.event_dao import EventDAO
 from connect_database import create_db_connection
 from tabulate import tabulate
-from views.view_event import view_events, view_create_event, view_update_event, view_search_event_by_name_or_client, view_delete_event, view_no_event_with_contract_unsigned, view_wich_event
+from views.view_event import view_events, view_create_event, view_update_event, view_search_event_by_name_or_client, view_delete_event, view_no_event_with_contract_unsigned, view_wich_event, view_update_support_in_event
 from controllers.client_crud import last_contact_client, wich_client
 from controllers.contract_crud import wich_contract
 
@@ -26,7 +26,23 @@ event_dao = EventDAO(session)
 
 def display_all_events(token):
     events = event_dao.get_all_events()
-    view_events(events)
+    clients = []
+    supports = []
+    if events:
+        for event in events:
+            contract = contract_dao.get_contract(event.contract_id)
+            if contract:
+                client = client_dao.get_client(contract.client_id)
+                clients.append(client)
+
+            if event.support_id:
+                support_obj = collaborator_dao.get_collaborator(event.support_id)
+                support = support_obj.full_name
+            else:
+                support = "Pas de collaborateur associé"
+            supports.append(support)
+
+    view_events(events, clients, supports)
 
 def display_event_without_support(token):
     events = event_dao.get_events_without_support()
@@ -97,6 +113,18 @@ def update_event(token):
                         last_contact_client(client_id)
 
 
+def update_support_in_event(token):
+    event = wich_event()
+    modified = False
+    if event:
+        support = collaborator_dao.get_collaborator(event.support_id)
+        new_data = view_update_support_in_event(event, support, modified)
+        if new_data:
+            modification = event_dao.update_event(event.id, new_data)
+            if modification:
+                modified = True
+                view_update_event(event, support, modified)
+
 
 def delete_event(token):
     event = wich_event()
@@ -112,6 +140,7 @@ def delete_event(token):
                     if remove:
                         deleted = True
                         view_delete_event(event, client, deleted)
+                        last_contact_client(client.id)
 
 
 def get_events_by_client(client):
