@@ -5,7 +5,7 @@ from commands.client_commands import client_commands
 from commands.collaborator_commands import collaborator_commands
 from commands.contract_commands import contract_commands
 from commands.event_commands import event_commands
-from commands.login_commands import login_commands, token_file_path
+from commands.login_logout_commands import auth_commands, token_file_path
 
 
 @click.group()
@@ -20,7 +20,7 @@ def cli(ctx):
         ctx.obj = {"token": None}
 
 # Ajouter les groupes de commandes
-cli.add_command(login_commands)
+cli.add_command(auth_commands)
 cli.add_command(client_commands)
 cli.add_command(collaborator_commands)
 cli.add_command(contract_commands)

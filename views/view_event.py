@@ -1,13 +1,9 @@
 import click
-from connect_database import create_db_connection
 from utils.decorators import department_permission_required
 from utils.input_validators import is_valid_date_format
 from controllers.department_crud import wich_collaborator_in_department
-from views.login import login
 from controllers.client_crud import wich_client
-from connect_database import create_db_connection
 from tabulate import tabulate
-from utils.decorators import department_permission_required
 
 COMMERCIAL = 3
 GESTION = 2

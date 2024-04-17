@@ -1,6 +1,5 @@
 import click
 from controllers.auth_permissions import authenticate, authorize
-from views.login import login
 from connect_database import create_db_connection
 from sqlalchemy.orm import sessionmaker
 from tabulate import tabulate

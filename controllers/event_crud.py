@@ -2,17 +2,13 @@
 from connect_database import create_db_connection
 from utils.decorators import department_permission_required
 from utils.get_object import get_id_by_token
-from views.view_client import view_create_client, view_update_client
 from DAO.client_dao import ClientDAO
 from DAO.contract_dao import ContractDAO
-from views.view_contract import view_create_contract, view_wich_contract, view_update_contract
-from views.login import login
 from DAO.collaborator_dao import CollaboratorDAO
 from DAO.client_dao import ClientDAO
 from DAO.contract_dao import ContractDAO
 from DAO.event_dao import EventDAO
 from connect_database import create_db_connection
-from tabulate import tabulate
 from views.view_event import view_events, view_create_event, view_update_event, view_search_event_by_name_or_client, view_delete_event, view_no_event_with_contract_unsigned, view_wich_event, view_update_support_in_event
 from controllers.client_crud import last_contact_client, wich_client
 from controllers.contract_crud import wich_contract

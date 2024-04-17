@@ -1,17 +1,18 @@
 import click
 import os
 from dotenv import load_dotenv
-from views.login import login
+from controllers.login import login
+
 
 token_file_path = os.getenv('TOKEN_FILE_PATH')
 
 
 @click.group()
-def login_commands():
+def auth_commands():
     pass
 
 
-@login_commands.command()
+@auth_commands.command()
 @click.pass_context
 def login_command(ctx):
     ctx.invoke(login)  # Appeler la commande Click login
@@ -22,6 +23,17 @@ def login_command(ctx):
         # Écrire le token dans le fichier token.txt
         with open(token_file_path, "w") as file:
             file.write(token)
-        click.echo("Le token a été enregistré.")
-    else:
-        click.echo("Le token n'a pas été obtenu avec succès.")
+
+
+
+@auth_commands.command()
+@click.pass_context
+def logout_command(ctx):
+    if "token" in ctx.obj:
+        del ctx.obj["token"]
+
+    with open(token_file_path, "w") as file:
+        file.write("")
+
+    click.echo("Vous avez été déconnecté.")
+
