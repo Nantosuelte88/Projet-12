@@ -4,12 +4,14 @@ from DAO.department_dao import DepartmentDAO
 import bcrypt
 from datetime import datetime, timedelta, timezone
 from views.view_collaborator import view_create_collaborator, view_update_collaborator, view_wich_collaborator, view_delete_collaborator
+from utils.decorators import permission_for_gestion_department
 
 
 session = create_db_connection()
 collaborator_dao = CollaboratorDAO(session)
 department_dao = DepartmentDAO(session)
 
+@permission_for_gestion_department()
 def create_collaborator(token):
     created = False
     departments = department_dao.get_all_departments()
@@ -32,21 +34,21 @@ def create_collaborator(token):
             created = True
             view_create_collaborator(created, departments)
 
-
+@permission_for_gestion_department()
 def update_collaborator(token):
     collaborator = wich_collaborator()
     departments = department_dao.get_all_departments()
-
+    department =  department_dao.get_department(collaborator.department_id)
     if collaborator:
         modified = False
-        new_data = view_update_collaborator(collaborator, modified, departments)
-        print(new_data)
+        new_data = view_update_collaborator(collaborator, modified, departments, department)
         if new_data:
             modification = collaborator_dao.update_collaborator(collaborator.id, new_data)
             if modification:
                 modified = True
-                view_update_collaborator(collaborator, modified, departments)
+                view_update_collaborator(collaborator, modified, departments, department)
                 
+@permission_for_gestion_department()
 def delete_collaborator(token):
     collaborator = wich_collaborator()
     deleted = False

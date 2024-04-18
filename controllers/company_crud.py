@@ -5,7 +5,6 @@ from sqlalchemy.orm import sessionmaker
 from models.collaboration import Collaborator, Department
 from models.clients import Client, Contract, Event
 from datetime import datetime, timedelta, timezone
-from utils.decorators import department_permission_required
 from views.view_company import view_create_company
 
 from DAO.client_dao import ClientDAO

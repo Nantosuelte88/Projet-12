@@ -5,7 +5,6 @@ from utils.input_validators import is_valid_email, is_valid_phone_number
 from tabulate import tabulate
 from controllers.company_crud import create_company
 from views.view_company import wich_company
-from utils.decorators import department_permission_required
 
 
 def view_clients(clients, collaborators):
@@ -213,3 +212,4 @@ def view_delete_client(client, deleted, contracts):
         else:
             click.echo('Suppression annulée')
             return False
+        

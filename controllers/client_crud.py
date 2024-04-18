@@ -5,8 +5,9 @@ from sqlalchemy.orm import sessionmaker
 from models.collaboration import Collaborator, Department
 from models.clients import Client, Contract, Event
 from datetime import datetime, timedelta, timezone
-from utils.decorators import department_permission_required
+from utils.decorators import permission_for_commercial_department
 from views.view_client import view_clients, view_create_client, view_wich_client, view_update_client, view_delete_client
+from views.view_collaborator import view_not_authorized
 from utils.get_object import get_id_by_token
 from DAO.client_dao import ClientDAO
 from DAO.company_dao import CompanyDAO
@@ -51,17 +52,22 @@ def display_my_clients(token):
             collaborators.append(collaborator)
     view_clients(clients, collaborators)
 
-
+@permission_for_commercial_department()
 def delete_client(token):
     client = wich_client()
-    deleted = False
-    contracts_clients = contract_dao.get_contracts_by_client_id(client.id)
-    choice = view_delete_client(client, deleted, contracts_clients)
-    if choice:
-        remove = client_dao.delete_client(client.id)
-        if remove:
-            deleted = True
-            view_delete_client(client, deleted, contracts_clients)
+    if client:
+        user_id = get_id_by_token(token)
+        if client.commercial_id == user_id:
+            deleted = False
+            contracts_clients = contract_dao.get_contracts_by_client_id(client.id)
+            choice = view_delete_client(client, deleted, contracts_clients)
+            if choice:
+                remove = client_dao.delete_client(client.id)
+                if remove:
+                    deleted = True
+                    view_delete_client(client, deleted, contracts_clients)
+        else:
+            view_not_authorized(client)
 
 def last_contact_client(client_id):
     last_contact = datetime.now(timezone.utc)
@@ -71,6 +77,7 @@ def last_contact_client(client_id):
         client_dao.update_client(client.id, new_data)
 
 
+@permission_for_commercial_department()
 def create_new_client(token):
     created = False
     info_client = view_create_client(created)
@@ -103,24 +110,29 @@ def create_new_client(token):
             created = True
             view_create_client(created)
 
-
+@permission_for_commercial_department()
 def update_client(token):
     modified = False
     client = wich_client()
-    client_id = client.id
-    response = view_update_client(client, modified)
-    if response:
-        if response.get("company_id"):
-            company_id = {'company_id': response.get("company_id")}
-            company_name = {'company_name': response.get("company_name")}
-            modified_client = client_dao.update_client(client_id, company_name)
-            modified_client = client_dao.update_client(client_id, company_id)
+    if client:
+        user_id = get_id_by_token(token)
+        if client.commercial_id == user_id:
+            client_id = client.id
+            response = view_update_client(client, modified)
+            if response:
+                if response.get("company_id"):
+                    company_id = {'company_id': response.get("company_id")}
+                    company_name = {'company_name': response.get("company_name")}
+                    modified_client = client_dao.update_client(client_id, company_name)
+                    modified_client = client_dao.update_client(client_id, company_id)
+                else:
+                    modified_client = client_dao.update_client(client_id, response)
+                if modified_client:
+                    modified = True
+                    last_contact_client(client_id)
+                    view_update_client(client, modified)
         else:
-            modified_client = client_dao.update_client(client_id, response)
-        if modified_client:
-            modified = True
-            last_contact_client(client_id)
-            view_update_client(client, modified)
+            view_not_authorized(client)
 
 def wich_client():
     found = False

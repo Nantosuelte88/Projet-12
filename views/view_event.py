@@ -1,13 +1,10 @@
 import click
-from utils.decorators import department_permission_required
 from utils.input_validators import is_valid_date_format
 from controllers.department_crud import wich_collaborator_in_department
 from controllers.client_crud import wich_client
 from tabulate import tabulate
+from utils.decorators import SUPPORT
 
-COMMERCIAL = 3
-GESTION = 2
-SUPPORT = 1
 
 
 def view_events(events, clients, supports):
@@ -37,8 +34,17 @@ def view_events(events, clients, supports):
     else:
         print("Aucun événement à afficher")
 
-def view_no_event_with_contract_unsigned(contract, client):
+def view_no_event_with_contract_unsigned(client, contract):
     click.echo(f'Le contrat n°{contract.id} du client {client.full_name} , n\'est pas signé. Vous ne pouvez pas créer d\'événement avec un contrat non signé')
+
+
+def view_contract_has_event(contract, event):
+    click.echo(f'L\'événement ~ {event.name} ~ existe deja pour le contrat n°{contract.id}. Vous devez supprimer ou modifier l\'événement existant ou choisir un autre contrat.')
+
+
+def view_no_event_update_for_wrong_support(event):
+    click.echo(f'Seul le collaborateur du départmeent Support affilié à l\'événement ~ {event.name} ~ peut avoir accès à cette fonctionnalité.')
+
 
 def view_create_event(client, contract, created):
     if created:
@@ -89,7 +95,7 @@ def view_create_event(client, contract, created):
             response = click.prompt(
                 'Voulez-vous ajouter un collaborateur du département support ? (O/N)', type=str)
         if response.upper() == 'O':
-            collaborator_id = wich_collaborator_in_department(SUPPORT)
+            collaborator_id = wich_collaborator_in_department(SUPPORT) 
             click.echo(f'collabo : {collaborator_id}')
             if collaborator_id:
                 collaborator = collaborator_id

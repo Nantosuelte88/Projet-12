@@ -3,7 +3,6 @@ from controllers.auth_permissions import authenticate, authorize
 from connect_database import create_db_connection
 from sqlalchemy.orm import sessionmaker
 from tabulate import tabulate
-from utils.decorators import department_permission_required
 from controllers.client_crud import wich_client
 from utils.input_validators import is_valid_money_format
 
@@ -161,3 +160,4 @@ def view_delete_contract(contract, client, deleted, events):
         else:
             click.echo('Suppression annulée')
             return False
+        

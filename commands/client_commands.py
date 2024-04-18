@@ -30,7 +30,7 @@ def view_my_clients(ctx):
 
 @client_commands.command()
 @click.pass_context
-def create_user(ctx):
+def create_client(ctx):
     token = ctx.obj["token"]
     if token is None or not authorize(token):
         click.echo("Veuillez vous connecter en utilisant la commande 'login' avant de créer un nouvel utilisateur.")
@@ -40,7 +40,7 @@ def create_user(ctx):
 
 @client_commands.command()
 @click.pass_context
-def update_client(ctx):
+def update_client_command(ctx):
     token = ctx.obj["token"]
     if token is None or not authorize(token):
         click.echo("Veuillez vous connecter en utilisant la commande 'login' avant de modifier un utilisateur.")
@@ -50,7 +50,7 @@ def update_client(ctx):
 
 @client_commands.command()
 @click.pass_context
-def delete_client(ctx):
+def delete_client_command(ctx):
     token = ctx.obj["token"]
     if token is None or not authorize(token):
         click.echo("Veuillez vous connecter en utilisant la commande 'login' avant de supprimer un utilisateur.")

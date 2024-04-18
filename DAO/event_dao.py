@@ -30,7 +30,7 @@ class EventDAO:
         return events
     
     def get_event_by_contract_id(self, contract_id):
-        events = self.session.query(Event).filter_by(contract_id=contract_id)
+        events = self.session.query(Event).filter_by(contract_id=contract_id).first()
         return events
     
     def get_events_by_collaborator_id(self, collaborator_id):

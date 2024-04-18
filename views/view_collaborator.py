@@ -70,8 +70,8 @@ def view_create_collaborator(created, departments):
             new_collaborator.append(password)
             
             click.echo('Choisissez un departement à associer :')
-            for idx, department in enumerate(departments, start=1):
-                click.echo(f"{idx}. {department.name}")    
+            for department in departments:
+                click.echo(f"{department.id}. {department.name}")    
             selected_department = click.prompt("Sélectionner lu numéro de departement", type=int)
             while not selected_department <=3:
                 click.echo('Veuillez selectionner un numéro valide.')
@@ -84,7 +84,7 @@ def view_create_collaborator(created, departments):
             click.echo("Une erreur s'est produite.")
 
 
-def view_update_collaborator(collaborator, modified, departments):
+def view_update_collaborator(collaborator, modified, departments, department):
     if modified:
         click.echo("Collaborateur modifié avec succès")
 
@@ -96,7 +96,7 @@ def view_update_collaborator(collaborator, modified, departments):
             click.echo(f"1: Le nom complet : {collaborator.full_name}")
             click.echo(f"2: L'email : {collaborator.email}")
             click.echo(f"3: Le mot de passe ")
-            click.echo(f"4: le departement associé : {collaborator.department_id}")
+            click.echo(f"4: le departement associé : {department.name}")
 
             choice = click.prompt(
                 "Entrez le numéro correspondant à votre choix: ", type=int)
@@ -125,12 +125,12 @@ def view_update_collaborator(collaborator, modified, departments):
             elif choice == 4:
                 if departments:
                     click.echo('Choisissez un departement à associer :')
-                    for idx, department in enumerate(departments, start=1):
-                        click.echo(f"{idx}. {department.name}")    
+                    for department in departments:
+                        click.echo(f"{department.id}. {department.name}")      
                     selected_department = click.prompt("Sélectionner lu numéro de departement", type=int)
                     while not selected_department <=3:
                         click.echo('Veuillez selectionner un numéro valide.')
-                        selected_department = click.prompt("Sélectionner lu numéro de departement", type=int)
+                        selected_department = click.prompt("Sélectionner le numéro de departement", type=int)
                     collaborator_data = {'department_id': selected_department}
             
         
@@ -155,3 +155,8 @@ def view_delete_collaborator(collaborator, deleted):
         else:
             click.echo('Suppression annulée')
             return False
+
+
+def view_not_authorized(client):
+    click.echo(f'Seul le commercial du client {client.full_name} est autorisé à utiliser cette fonctionnalité')
+    return None

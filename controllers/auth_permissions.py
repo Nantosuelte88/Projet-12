@@ -81,7 +81,7 @@ def verify_department(token, department_id):
         payload = jwt.decode(token, secret_key, algorithms=['HS256'])
         user_department_id = payload['department_id']
 
-        if department_id is None or user_department_id == department_id:
+        if user_department_id == department_id:
             return True
 
         return False
