@@ -1,6 +1,5 @@
 from sqlalchemy import Column, Integer, String, Date, Float, ForeignKey, Boolean
-from sqlalchemy.orm import relationship, declarative_base
-from models.collaboration import Collaborator, Department
+from sqlalchemy.orm import relationship
 from models.collaboration import Base as CollaborationBase
 
 Base = CollaborationBase
@@ -61,4 +60,3 @@ class Company(Base):
     phone_number = Column(String(20), nullable=True)
     address = Column(String(200), nullable=True)
     industry = Column(String(100), nullable=True)
-    

@@ -2,15 +2,14 @@ import click
 from utils.input_validators import is_valid_email, is_valid_password
 
 
-
 def view_login(checked, authorized):
     """
-    Permet de tester l'email et le mot de passe, reçoit le token
+    Affiche le résultat de la tentative de connexion en fonction de la vérification et de l'autorisation.
     """
     if checked:
         if authorized:
             click.echo("Accès autorisé")
-        else: 
+        else:
             click.echo("Accès non autorisé")
 
     else:
@@ -23,9 +22,10 @@ def view_login(checked, authorized):
             email = click.prompt('Email', type=str)
         info_login.append(email)
 
-        password = click.prompt('Votre mot de passe', hide_input=True, type=str)
+        password = click.prompt('Votre mot de passe',
+                                hide_input=True, type=str)
         while not is_valid_password(password):
             click.echo('Veuillez entrer un mot de passe valide')
         info_login.append(password)
-            
+
         return info_login

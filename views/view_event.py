@@ -6,8 +6,10 @@ from tabulate import tabulate
 from utils.decorators import SUPPORT
 
 
-
 def view_events(events, clients, supports):
+    """
+    Affiche les détails des événements.
+    """
     if events:
         table_data = []
 
@@ -18,7 +20,8 @@ def view_events(events, clients, supports):
                 event.name,
                 event.contract_id,
                 client.full_name if client else "Client inconnu",
-                f"{client.phone_number}\n{client.email}" if client else "Client inconnu",
+                f"{client.phone_number}\n{
+                    client.email}" if client else "Client inconnu",
                 event.date_start,
                 event.date_end,
                 support,
@@ -34,24 +37,32 @@ def view_events(events, clients, supports):
     else:
         print("Aucun événement à afficher")
 
+
 def view_no_event_with_contract_unsigned(client, contract):
-    click.echo(f'Le contrat n°{contract.id} du client {client.full_name} , n\'est pas signé. Vous ne pouvez pas créer d\'événement avec un contrat non signé')
+    click.echo(f'Le contrat n°{contract.id} du client {client.full_name} , 
+               n\'est pas signé. Vous ne pouvez pas créer d\'événement avec un contrat non signé')
 
 
 def view_contract_has_event(contract, event):
-    click.echo(f'L\'événement ~ {event.name} ~ existe deja pour le contrat n°{contract.id}. Vous devez supprimer ou modifier l\'événement existant ou choisir un autre contrat.')
+    click.echo(f'L\'événement ~ {event.name} ~ existe deja pour le contrat n°{contract.id}. 
+               Vous devez supprimer ou modifier l\'événement existant ou choisir un autre contrat.')
 
 
 def view_no_event_update_for_wrong_support(event):
-    click.echo(f'Seul le collaborateur du départmeent Support affilié à l\'événement ~ {event.name} ~ peut avoir accès à cette fonctionnalité.')
+    click.echo(f'Seul le collaborateur du départmeent Support affilié à l\'événement 
+               ~ {event.name} ~ peut avoir accès à cette fonctionnalité.')
 
 
 def view_create_event(client, contract, created):
+    """
+    Crée un nouvel événement pour un client sous contrat.
+    """
     if created:
         click.echo('Nouvel événement crée avec succès')
 
     else:
-        click.echo(f"Création d'un nouvel evenement pour le client {client.full_name} sous contrat n°{contract.id}")
+        click.echo(f"Création d'un nouvel evenement pour le client {
+                   client.full_name} sous contrat n°{contract.id}")
 
         new_event = []
 
@@ -95,7 +106,7 @@ def view_create_event(client, contract, created):
             response = click.prompt(
                 'Voulez-vous ajouter un collaborateur du département support ? (O/N)', type=str)
         if response.upper() == 'O':
-            collaborator_id = wich_collaborator_in_department(SUPPORT) 
+            collaborator_id = wich_collaborator_in_department(SUPPORT)
             click.echo(f'collabo : {collaborator_id}')
             if collaborator_id:
                 collaborator = collaborator_id
@@ -110,12 +121,17 @@ def view_create_event(client, contract, created):
 
 
 def view_search_event_by_name_or_client():
-    click.echo('Souhaitez-vous retrouver l\'événement par son nom ou par son client ?')
+    """
+    Permet de rechercher un événement par son nom ou par son client.
+    """
+    click.echo(
+        'Souhaitez-vous retrouver l\'événement par son nom ou par son client ?')
     click.echo('1: Son nom')
     click.echo('2: Son client')
     choice = click.prompt('Entrez le numéro correspondant', type=int)
     if choice == 1:
-        event_name = click.prompt('Quel est le nom de l\'événement? ', type=str)
+        event_name = click.prompt(
+            'Quel est le nom de l\'événement? ', type=str)
         if event_name:
             return {'name': event_name}
     if choice == 2:
@@ -125,6 +141,9 @@ def view_search_event_by_name_or_client():
 
 
 def view_wich_event(events):
+    """
+    Affiche les événements trouvés et permet à l'utilisateur d'en sélectionner un.
+    """
     if events:
         click.echo(f"Evénement.s trouvé.s :")
         for idx, event in enumerate(events, start=1):
@@ -145,13 +164,18 @@ def view_wich_event(events):
 
 
 def view_update_support_in_event(event, support, modified):
+    """
+    Affiche les informations sur la modification du collaborateur de support pour un événement donné.
+    """
     if modified:
         click.echo("Evenement modifié avec succès")
     else:
         if support:
-            click.echo(f"Modifcation du collaborateur {support.full_name} pour l'événement ~ {event.name} ~ ")
+            click.echo(f"Modifcation du collaborateur {
+                       support.full_name} pour l'événement ~ {event.name} ~ ")
         else:
-            click.echo(f"Ajout d'un collaborateur pour l'événement ~ {event.name} ~ ")
+            click.echo(f"Ajout d'un collaborateur pour l'événement ~ {
+                       event.name} ~ ")
 
         collaborator_id = wich_collaborator_in_department(SUPPORT)
         if collaborator_id:
@@ -159,7 +183,11 @@ def view_update_support_in_event(event, support, modified):
             if event_data:
                 return event_data
 
+
 def view_update_event(event, client_name, modified):
+    """
+    Affiche les options de modification pour un événement donné et retourne les données mises à jour de l'événement.
+    """
     if modified:
         click.echo("Evenement modifié avec succès")
 
@@ -235,8 +263,10 @@ def view_update_event(event, client_name, modified):
         elif choice == 7:
             new_client = wich_client()
             if new_client:
-                click.echo(f'Le client {client_name} va être remplacé par le client {new_client.full_name} pour l\'événement ~ {event.name} ~')
-                response = click.prompt('Confirmez-vous cette modification ? (O/N) ', type=str)
+                click.echo(f'Le client {client_name} va être remplacé par le client 
+                           {new_client.full_name} pour l\'événement ~ {event.name} ~')
+                response = click.prompt(
+                    'Confirmez-vous cette modification ? (O/N) ', type=str)
                 if response.upper() == 'O':
                     contract_data = {'client_id': new_client.id}
                     return contract_data
@@ -251,11 +281,16 @@ def view_update_event(event, client_name, modified):
 
 
 def view_delete_event(event, client, deleted):
+    """
+    Affiche le message de suppression d'un événement et retourne True si l'événement est supprimé, sinon False.
+    """
     if deleted:
         click.echo('Evenement supprimé avec succès')
     else:
-        click.echo(f'Suppresion de l\'événement ~ {event.name} ~ du client {client.full_name}')
-        response = click.prompt('Souhaitez-vous supprimer cet événement ? (O/N)')
+        click.echo(f'Suppresion de l\'événement ~ {
+                   event.name} ~ du client {client.full_name}')
+        response = click.prompt(
+            'Souhaitez-vous supprimer cet événement ? (O/N)')
         if response.upper() == 'O':
             return True
         else:

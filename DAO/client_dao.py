@@ -1,9 +1,4 @@
-import jwt
-import os
-from models.clients import Client, Contract, Event, Company
-from models.collaboration import Collaborator, Department
-from connect_database import create_db_connection
-from sqlalchemy.orm import sessionmaker
+from models.clients import Client
 
 
 class ClientDAO:
@@ -27,11 +22,13 @@ class ClientDAO:
         return client
 
     def get_clients_by_name(self, client_name):
-        clients = self.session.query(Client).filter(Client.full_name.ilike(f"%{client_name}%")).all()
+        clients = self.session.query(Client).filter(
+            Client.full_name.ilike(f"%{client_name}%")).all()
         return clients
-    
+
     def get_clients_by_collaborator_id(self, collaborator_id):
-        clients = self.session.query(Client).filter_by(commercial_id=collaborator_id).all()
+        clients = self.session.query(Client).filter_by(
+            commercial_id=collaborator_id).all()
         return clients
 
     def create_client(self, client_data):

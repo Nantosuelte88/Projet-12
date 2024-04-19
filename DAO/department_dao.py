@@ -1,9 +1,4 @@
-import jwt
-import os
-from models.clients import Client, Contract, Event
-from models.collaboration import Collaborator, Department
-from connect_database import create_db_connection
-from sqlalchemy.orm import sessionmaker
+from models.collaboration import Department
 
 
 class DepartmentDAO:

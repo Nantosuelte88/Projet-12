@@ -25,7 +25,6 @@ def login_command(ctx):
             file.write(token)
 
 
-
 @auth_commands.command()
 @click.pass_context
 def logout_command(ctx):
@@ -36,4 +35,3 @@ def logout_command(ctx):
         file.write("")
 
     click.echo("Vous avez été déconnecté.")
-

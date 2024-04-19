@@ -22,6 +22,9 @@ event_dao = EventDAO(session)
 
 
 def display_all_events(token):
+    """
+    Affiche tous les événements de la base de données avec leurs clients et supports associés.
+    """
     events = event_dao.get_all_events()
     clients = []
     supports = []
@@ -33,7 +36,8 @@ def display_all_events(token):
                 clients.append(client)
 
             if event.support_id:
-                support_obj = collaborator_dao.get_collaborator(event.support_id)
+                support_obj = collaborator_dao.get_collaborator(
+                    event.support_id)
                 support = support_obj.full_name
             else:
                 support = "Pas de collaborateur associé"
@@ -41,19 +45,63 @@ def display_all_events(token):
 
     view_events(events, clients, supports)
 
+
 @permission_for_gestion_department()
 def display_event_without_support(token):
+    """
+    Affiche tous les événements n'ayant pas de support associé.
+    """
     events = event_dao.get_events_without_support()
-    view_events(events)
+    clients = []
+    supports = []
+    if events:
+        for event in events:
+            contract = contract_dao.get_contract(event.contract_id)
+            if contract:
+                client = client_dao.get_client(contract.client_id)
+                clients.append(client)
+
+            if event.support_id:
+                support_obj = collaborator_dao.get_collaborator(
+                    event.support_id)
+                support = support_obj.full_name
+            else:
+                support = "Pas de collaborateur associé"
+            supports.append(support)
+    view_events(events, clients, supports)
+
 
 @permission_for_support_department()
 def display_my_events(token):
+    """
+    Affiche tous les événements affiliés à l'utilisateur du département support.
+    """
     collaborator_id = get_id_by_token(token)
     events = event_dao.get_events_by_collaborator_id(collaborator_id)
-    view_events(events)
+    clients = []
+    supports = []
+    if events:
+        for event in events:
+            contract = contract_dao.get_contract(event.contract_id)
+            if contract:
+                client = client_dao.get_client(contract.client_id)
+                clients.append(client)
+
+            if event.support_id:
+                support_obj = collaborator_dao.get_collaborator(
+                    event.support_id)
+                support = support_obj.full_name
+            else:
+                support = "Pas de collaborateur associé"
+            supports.append(support)
+    view_events(events, clients, supports)
+
 
 @permission_for_commercial_department()
 def create_event(token):
+    """
+    Crée un nouvel événement associé à un contrat si l'utilisateur est un commercial affilié au client associé au contrat, et si le contrat est signé.
+    """
     created = False
     contract = wich_contract()
     if contract:
@@ -67,7 +115,8 @@ def create_event(token):
                 if contract.status:
                     user_id = get_id_by_token(token)
                     if client.commercial_id == user_id:
-                        event_data = view_create_event(client, contract, created)
+                        event_data = view_create_event(
+                            client, contract, created)
                         print(event_data)
                         support = event_data[6]
                         if support:
@@ -96,8 +145,12 @@ def create_event(token):
                 else:
                     view_no_event_with_contract_unsigned(client, contract)
 
+
 @permission_for_support_department()
 def update_event(token):
+    """
+    Met à jour un événement si l'utilisateur est le support associé à cet événement.
+    """
     event = wich_event()
     if event:
         user_id = get_id_by_token(token)
@@ -107,24 +160,32 @@ def update_event(token):
                 client = client_dao.get_client(contract.client_id)
                 if client:
                     modified = False
-                    new_data = view_update_event(event, client.full_name, modified)
+                    new_data = view_update_event(
+                        event, client.full_name, modified)
                     if new_data:
                         if 'client_id' in new_data:
                             client_id = new_data['client_id']
-                            modification = contract_dao.update_contract(event.contract_id, new_data)
+                            modification = contract_dao.update_contract(
+                                event.contract_id, new_data)
                         else:
-                            modification = event_dao.update_event(event.id, new_data)
+                            modification = event_dao.update_event(
+                                event.id, new_data)
                             client_id = client.id
 
                         if modification:
                             modified = True
-                            view_update_event(event, client.full_name, modified)
+                            view_update_event(
+                                event, client.full_name, modified)
                             last_contact_client(client_id)
         else:
             view_no_event_update_for_wrong_support(event)
 
+
 @permission_for_gestion_department()
 def update_support_in_event(token):
+    """
+    Met à jour le support d'événement si l'utilisateur est un gestionnaire.
+    """
     event = wich_event()
     modified = False
     if event:
@@ -137,7 +198,11 @@ def update_support_in_event(token):
                 view_update_event(event, support, modified)
 
 
+@permission_for_commercial_department()
 def delete_event(token):
+    """
+    Supprime un événement.
+    """
     event = wich_event()
     contract = contract_dao.get_contract(event.contract_id)
     if contract:
@@ -155,6 +220,9 @@ def delete_event(token):
 
 
 def get_events_by_client(client):
+    """
+    Retourne une liste d'événements pour un client donné.
+    """
     if client:
         contracts = contract_dao.get_contracts_by_client_id(client.id)
         events = []
@@ -166,6 +234,9 @@ def get_events_by_client(client):
 
 
 def wich_event():
+    """
+    Sélectionne un événement en fonction de critères spécifiés par l'utilisateur.
+    """
     response = view_search_event_by_name_or_client()
     if response:
         if 'client_name' in response:
@@ -176,10 +247,10 @@ def wich_event():
             event_name = response['name']
             if event_name:
                 events = event_dao.get_events_by_name(event_name)
-        
+
         event = view_wich_event(events)
         if event:
             return event
-    
+
     else:
         return None

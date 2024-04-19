@@ -1,11 +1,12 @@
 import click
-from controllers.auth_permissions import authenticate, authorize
+from controllers.auth_permissions import authorize
 from controllers.contract_crud import display_all_contracts, display_contracts_unpaid, display_unsigned_contracts, create_contract, update_contract, delete_contract
 
 
 @click.group()
 def contract_commands():
     pass
+
 
 @contract_commands.command()
 @click.pass_context
@@ -18,8 +19,8 @@ def view_contracts_command(ctx):
         return
     display_all_contracts(token)
 
-@contract_commands.command()
 
+@contract_commands.command()
 @click.pass_context
 def create_contract_command(ctx):
     token = ctx.obj["token"]
@@ -41,6 +42,7 @@ def update_contract_command(ctx):
             "Veuillez vous connecter en utilisant la commande 'login' avant de modifier un contrat.")
         return
     update_contract(token)
+
 
 @contract_commands.command()
 @click.pass_context
@@ -75,5 +77,4 @@ def delete_contract_command(ctx):
         click.echo(
             "Veuillez vous connecter en utilisant la commande 'login' avant de supprimer un contrat.")
         return
-    delete_contract(token) 
-
+    delete_contract(token)

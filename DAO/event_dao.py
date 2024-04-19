@@ -1,9 +1,4 @@
-import jwt
-import os
-from models.clients import Client, Contract, Event
-from models.collaboration import Collaborator, Department
-from connect_database import create_db_connection
-from sqlalchemy.orm import sessionmaker
+from models.clients import Event
 
 
 class EventDAO:
@@ -24,23 +19,27 @@ class EventDAO:
         if not event:
             return None
         return event
-    
+
     def get_events_by_name(self, event_name):
-        events = self.session.query(Event).filter(Event.name.ilike(f"%{event_name}%")).all()
+        events = self.session.query(Event).filter(
+            Event.name.ilike(f"%{event_name}%")).all()
         return events
-    
+
     def get_event_by_contract_id(self, contract_id):
-        events = self.session.query(Event).filter_by(contract_id=contract_id).first()
+        events = self.session.query(Event).filter_by(
+            contract_id=contract_id).first()
         return events
-    
+
     def get_events_by_collaborator_id(self, collaborator_id):
-        events = self.session.query(Event).filter_by(support_id=collaborator_id).all()
+        events = self.session.query(Event).filter_by(
+            support_id=collaborator_id).all()
         return events
 
     def get_events_without_support(self):
-        events = self.session.query(Event).filter(Event.support_id.is_(None)).all()
+        events = self.session.query(Event).filter(
+            Event.support_id.is_(None)).all()
         return events
-    
+
     def create_event(self, event_data):
         event = Event(**event_data)
         self.session.add(event)

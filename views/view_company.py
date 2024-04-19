@@ -1,18 +1,19 @@
 import click
-from connect_database import create_db_connection
-from sqlalchemy.orm import sessionmaker
-from tabulate import tabulate
 from utils.input_validators import is_valid_phone_number
-from tabulate import tabulate
+
 
 def wich_company(company_name, matching_companies):
+    """
+    Affiche les entreprises correspondantes et permet à l'utilisateur de sélectionner une entreprise parmi elles.
+    """
     if matching_companies:
         click.echo('Entreprises correspondante.s trouvée.s :')
         if len(matching_companies) == 1:
             click.echo("Une entreprise trouvée ")
             click.echo(f"{matching_companies[0].name}")
 
-            response = click.prompt('Voulez-vous sélectionner cette entreprise ? (O/N)', type=str)
+            response = click.prompt(
+                'Voulez-vous sélectionner cette entreprise ? (O/N)', type=str)
             if response.upper() == 'O':
                 company_id = matching_companies[0].id
                 return company_name, company_id
@@ -21,10 +22,12 @@ def wich_company(company_name, matching_companies):
         else:
             for i, company in enumerate(matching_companies):
                 click.echo(f'{i+1}. {company.name}')
-            
-            response = click.prompt('Voulez-vous sélectionner une entreprise parmi celles-ci? (O/N)', type=str)
+
+            response = click.prompt(
+                'Voulez-vous sélectionner une entreprise parmi celles-ci? (O/N)', type=str)
             if response.upper() == 'O':
-                selected_index = click.prompt('Sélectionnez l\'entreprise (entrez le numéro)', type=int)
+                selected_index = click.prompt(
+                    'Sélectionnez l\'entreprise (entrez le numéro)', type=int)
                 if 1 <= selected_index <= len(matching_companies):
                     selected_company = matching_companies[selected_index - 1]
                     company_id = selected_company.id
@@ -39,7 +42,6 @@ def wich_company(company_name, matching_companies):
         return None, None
 
 
-
 def view_create_company(company_name):
     """
     Crée une nouvelle entreprise
@@ -50,7 +52,8 @@ def view_create_company(company_name):
     industry = None
 
     click.echo(f"Création de l'entreprise {company_name}")
-    response = click.prompt("Souhaitez-vous ajouter d'autres informations? (O/N) ")
+    response = click.prompt(
+        "Souhaitez-vous ajouter d'autres informations? (O/N) ")
     if response.upper() == "O":
 
         phone_number = click.prompt('Numéro de téléphone', type=str)
@@ -71,5 +74,3 @@ def view_create_company(company_name):
     new_company.extend([company_name, phone_number, address, industry])
 
     return new_company
-
-

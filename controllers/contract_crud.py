@@ -1,6 +1,6 @@
 
 from connect_database import create_db_connection
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 from DAO.client_dao import ClientDAO
 from DAO.contract_dao import ContractDAO
 from DAO.event_dao import EventDAO
@@ -17,8 +17,11 @@ contract_dao = ContractDAO(session)
 event_dao = EventDAO(session)
 collaborator_dao = CollaboratorDAO(session)
 
+
 def display_all_contracts(token):
-    # Récupérer tous les contrats de la base de données
+    """
+    Affiche tous les contrats de la base de données avec leurs clients associés.
+    """
     contracts = contract_dao.get_all_contracts()
     clients = []
     if contracts:
@@ -28,8 +31,12 @@ def display_all_contracts(token):
 
     view_contracts(contracts, clients)
 
+
 @permission_for_commercial_department()
 def display_contracts_unpaid(token):
+    """
+    Affiche tous les contrats impayés de la base de données avec leurs clients associés.
+    """
     contracts = contract_dao.get_unpaid()
     clients = []
     if contracts:
@@ -39,8 +46,12 @@ def display_contracts_unpaid(token):
 
     view_contracts(contracts, clients)
 
+
 @permission_for_commercial_department()
 def display_unsigned_contracts(token):
+    """
+    Affiche tous les contrats non signés de la base de données avec leurs clients associés.
+    """
     contracts = contract_dao.get_contract_unsigned()
     clients = []
     if contracts:
@@ -53,6 +64,9 @@ def display_unsigned_contracts(token):
 
 @permission_for_gestion_department()
 def create_contract(token):
+    """
+    Crée un nouveau contrat en utilisant la date actuelle comme date de création.
+    """
     client = wich_client()
     created = False
     if client:
@@ -75,42 +89,53 @@ def create_contract(token):
                 view_create_contract(client, created)
                 last_contact_client(client.id)
 
+
 @permission_commercial_or_gestion()
 def update_contract(token):
+    """
+    Modifie un contrat, en vérifiant l'autorisation appropriée pour le faire.
+    Si l'utilisateur est un commercial, on vérifie qu'il est affilié au client concerné.
+    """
     contract = wich_contract()
     if contract:
-            modified = False
-            collaborator_checked = False
-            client = client_dao.get_client(contract.client_id)
-            if client:
+        modified = False
+        collaborator_checked = False
+        client = client_dao.get_client(contract.client_id)
+        if client:
 
-                # Si le collaborateur est un commercial -> on verifie que c'est celui affilié au client
-                collaborator_id = get_id_by_token(token)
-                collaborator = collaborator_dao.get_collaborator(collaborator_id)
-                if collaborator:
-                    if collaborator.department_id == COMMERCIAL:
-                        if collaborator.id == client.commercial_id:
-                            collaborator_checked = True
-                        else:
-                            view_not_authorized(client)
-                    else:
+            # Si le collaborateur est un commercial -> on verifie que c'est celui affilié au client
+            collaborator_id = get_id_by_token(token)
+            collaborator = collaborator_dao.get_collaborator(collaborator_id)
+            if collaborator:
+                if collaborator.department_id == COMMERCIAL:
+                    if collaborator.id == client.commercial_id:
                         collaborator_checked = True
+                    else:
+                        view_not_authorized(client)
+                else:
+                    collaborator_checked = True
 
-                if collaborator_checked:
-                    new_data = view_update_contract(contract, client.full_name, modified)
-                    if new_data:
-                        modification = contract_dao.update_contract(contract.id, new_data)
-                        if 'client_id' in new_data:
-                            client_id = new_data['client_id']
-                        else:
-                            client_id = client.id
-                        if modification:
-                            modified = True
-                            view_update_contract(contract, client, modified)
-                            last_contact_client(client_id)
+            if collaborator_checked:
+                new_data = view_update_contract(
+                    contract, client.full_name, modified)
+                if new_data:
+                    modification = contract_dao.update_contract(
+                        contract.id, new_data)
+                    if 'client_id' in new_data:
+                        client_id = new_data['client_id']
+                    else:
+                        client_id = client.id
+                    if modification:
+                        modified = True
+                        view_update_contract(contract, client, modified)
+                        last_contact_client(client_id)
 
 
+@permission_for_gestion_department()
 def delete_contract(token):
+    """ 
+    Supprime un contrat de la base de données.
+    """
     contract = wich_contract()
     if contract:
         deleted = False
@@ -127,6 +152,9 @@ def delete_contract(token):
 
 
 def wich_contract():
+    """
+    Renvoie une liste de contrats correspondant au client sélectionné.
+    """
     client = wich_client()
     if client:
         contracts_corresponding = contract_dao.get_contracts_by_client_id(

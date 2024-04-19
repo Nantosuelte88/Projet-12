@@ -1,9 +1,4 @@
-import jwt
-import os
-from models.clients import Client, Contract, Event
-from models.collaboration import Collaborator, Department
-from connect_database import create_db_connection
-from sqlalchemy.orm import sessionmaker
+from models.collaboration import Collaborator
 
 
 class CollaboratorDAO:
@@ -23,7 +18,8 @@ class CollaboratorDAO:
         return collaborator
 
     def get_corresponding_collaborator(self, collaborator_name):
-        collaborators_names_min = self.session.query(Collaborator).filter(Collaborator.full_name.ilike(f"%{collaborator_name}%")).all()
+        collaborators_names_min = self.session.query(Collaborator).filter(
+            Collaborator.full_name.ilike(f"%{collaborator_name}%")).all()
         return collaborators_names_min
 
     def create_collaborator(self, collaborator_data):

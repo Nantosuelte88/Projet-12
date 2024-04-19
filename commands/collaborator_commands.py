@@ -1,5 +1,5 @@
 import click
-from controllers.auth_permissions import authenticate, authorize
+from controllers.auth_permissions import authorize
 from controllers.collaborator_crud import create_collaborator, update_collaborator, delete_collaborator
 
 
@@ -31,6 +31,7 @@ def update_collaborator_command(ctx):
         return
     update_collaborator(token)
 
+
 @collaborator_commands.command()
 @click.pass_context
 def delete_collaborator_command(ctx):
@@ -41,4 +42,3 @@ def delete_collaborator_command(ctx):
             "Veuillez vous connecter en utilisant la commande 'login' avant de supprimer un collaborateur.")
         return
     delete_collaborator(token)
-

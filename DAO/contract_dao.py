@@ -1,9 +1,4 @@
-import jwt
-import os
-from models.clients import Client, Contract, Event
-from models.collaboration import Collaborator, Department
-from connect_database import create_db_connection
-from sqlalchemy.orm import sessionmaker
+from models.clients import Contract
 
 
 class ContractDAO:
@@ -24,17 +19,20 @@ class ContractDAO:
         if not contract:
             return None
         return contract
-    
+
     def get_contracts_by_client_id(self, client_id):
-        contracts = self.session.query(Contract).filter_by(client_id=client_id).all()
+        contracts = self.session.query(
+            Contract).filter_by(client_id=client_id).all()
         return contracts
 
     def get_unpaid(self):
-        contracts = self.session.query(Contract).filter(Contract.remaining_amount > 0).all()
+        contracts = self.session.query(Contract).filter(
+            Contract.remaining_amount > 0).all()
         return contracts
 
     def get_contract_unsigned(self):
-        contracts = self.session.query(Contract).filter(Contract.status == False).all()
+        contracts = self.session.query(Contract).filter(
+            Contract.status == False).all()
         return contracts
 
     def create_contract(self, contract_data):

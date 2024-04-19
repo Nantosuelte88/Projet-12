@@ -6,7 +6,7 @@ from sqlalchemy.orm import sessionmaker
 
 def create_db_connection():
     """
-    Permet d'etablir une connexion vers la base de donnée avec les informations de l'environnement
+    Etablit une connexion à la base de données en utilisant les informations d'environnement.
     """
 
     # Charge les variables d'environnement à partir du fichier .env

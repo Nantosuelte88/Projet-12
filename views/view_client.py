@@ -1,15 +1,15 @@
 import click
-from connect_database import create_db_connection
 from tabulate import tabulate
 from utils.input_validators import is_valid_email, is_valid_phone_number
 from tabulate import tabulate
-from controllers.company_crud import create_company
 from views.view_company import wich_company
 
 
 def view_clients(clients, collaborators):
+    """
+    Affiche les informations sur les clients et les collaborateurs associés.
+    """
     if clients:
-        # Préparer les données pour le tableau
         table_data = []
         for client, collaborator in zip(clients, collaborators):
             row = [
@@ -24,7 +24,6 @@ def view_clients(clients, collaborators):
             ]
             table_data.append(row)
 
-        # Afficher le tableau
         headers = [" ", "Nom", "Email", "Téléphone", "Nom de l'entreprise",
                    "Date de création", "Dernier contact", "Contact commercial chez Epic Event"]
         print(tabulate(table_data, headers, tablefmt="grid"))
@@ -34,7 +33,7 @@ def view_clients(clients, collaborators):
 
 def view_create_client(created):
     """
-    Crée un nouveau client
+    Affiche l'interface utilisateur pour la création d'un nouveau client.
     """
     if created:
         click.echo("Nouveau client enregistré avec succès")
@@ -85,6 +84,9 @@ def view_create_client(created):
 
 
 def view_wich_client(clients_corresponding, found):
+    """
+    Affiche l'interface utilisateur pour sélectionner un client parmi une liste de clients correspondants
+    """
     if found:
         if clients_corresponding:
             if len(clients_corresponding) == 1:
@@ -118,6 +120,9 @@ def view_wich_client(clients_corresponding, found):
 
 
 def view_update_client(client, modified):
+    """
+    Affiche l'interface utilisateur pour la modification des informations d'un client.
+    """
     if modified:
         click.echo("Client modifié avec succès")
     else:
@@ -199,6 +204,9 @@ def view_update_client(client, modified):
 
 
 def view_delete_client(client, deleted, contracts):
+    """
+    Affiche l'interface utilisateur pour la suppression d'un client.
+    """
     if deleted:
         click.echo('Client supprimé avec succès')
     elif contracts:
@@ -212,4 +220,3 @@ def view_delete_client(client, deleted, contracts):
         else:
             click.echo('Suppression annulée')
             return False
-        

@@ -1,10 +1,6 @@
 
 from connect_database import create_db_connection
-from sqlalchemy import Column, Integer, String, ForeignKey
-from sqlalchemy.orm import sessionmaker
-from models.collaboration import Collaborator, Department
-from models.clients import Client, Contract, Event
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 from utils.decorators import permission_for_commercial_department
 from views.view_client import view_clients, view_create_client, view_wich_client, view_update_client, view_delete_client
 from views.view_collaborator import view_not_authorized
@@ -18,26 +14,33 @@ from DAO.collaborator_dao import CollaboratorDAO
 session = create_db_connection()
 client_dao = ClientDAO(session)
 company_dao = CompanyDAO(session)
-contract_dao =ContractDAO(session)
+contract_dao = ContractDAO(session)
 event_dao = EventDAO(session)
 collaborator_dao = CollaboratorDAO(session)
 
 
 def display_all_clients(token):
-    # Récupérer tous les clients de la base de données
+    """
+    Affiche tous les clients de la base de données.
+    """
     clients = client_dao.get_all_clients()
     if clients:
         collaborators = []
         for client in clients:
             if client.commercial_id:
-                collaborator = collaborator_dao.get_collaborator(client.commercial_id)
+                collaborator = collaborator_dao.get_collaborator(
+                    client.commercial_id)
             else:
                 collaborator = "Pas de collaborateur associé"
             collaborators.append(collaborator)
     view_clients(clients, collaborators)
 
 
+@permission_for_commercial_department()
 def display_my_clients(token):
+    """
+    Affiche tous les clients d'un commercial.
+    """
     collaborators = []
     collaborator_id = get_id_by_token(token)
 
@@ -46,20 +49,26 @@ def display_my_clients(token):
         collaborators = []
         for client in clients:
             if client.commercial_id:
-                collaborator = collaborator_dao.get_collaborator(client.commercial_id)
+                collaborator = collaborator_dao.get_collaborator(
+                    client.commercial_id)
             else:
                 collaborator = "Pas de collaborateur associé"
             collaborators.append(collaborator)
     view_clients(clients, collaborators)
 
+
 @permission_for_commercial_department()
 def delete_client(token):
+    """
+    Supprime un client affilié au commercial exécutant la fonction.
+    """
     client = wich_client()
     if client:
         user_id = get_id_by_token(token)
         if client.commercial_id == user_id:
             deleted = False
-            contracts_clients = contract_dao.get_contracts_by_client_id(client.id)
+            contracts_clients = contract_dao.get_contracts_by_client_id(
+                client.id)
             choice = view_delete_client(client, deleted, contracts_clients)
             if choice:
                 remove = client_dao.delete_client(client.id)
@@ -69,7 +78,11 @@ def delete_client(token):
         else:
             view_not_authorized(client)
 
+
 def last_contact_client(client_id):
+    """
+    Met à jour la date du dernier contact d'un client.
+    """
     last_contact = datetime.now(timezone.utc)
     client = client_dao.get_client(client_id)
     if client:
@@ -79,6 +92,9 @@ def last_contact_client(client_id):
 
 @permission_for_commercial_department()
 def create_new_client(token):
+    """
+    Crée un client en utilisant la date actuelle comme date de création et en attribuant l'ID du commercial créant comme commercial_id.
+    """
     created = False
     info_client = view_create_client(created)
     if info_client:
@@ -110,8 +126,12 @@ def create_new_client(token):
             created = True
             view_create_client(created)
 
+
 @permission_for_commercial_department()
 def update_client(token):
+    """
+    Met à jour un client affilié au commercial exécutant la fonction. 
+    """
     modified = False
     client = wich_client()
     if client:
@@ -122,11 +142,15 @@ def update_client(token):
             if response:
                 if response.get("company_id"):
                     company_id = {'company_id': response.get("company_id")}
-                    company_name = {'company_name': response.get("company_name")}
-                    modified_client = client_dao.update_client(client_id, company_name)
-                    modified_client = client_dao.update_client(client_id, company_id)
+                    company_name = {
+                        'company_name': response.get("company_name")}
+                    modified_client = client_dao.update_client(
+                        client_id, company_name)
+                    modified_client = client_dao.update_client(
+                        client_id, company_id)
                 else:
-                    modified_client = client_dao.update_client(client_id, response)
+                    modified_client = client_dao.update_client(
+                        client_id, response)
                 if modified_client:
                     modified = True
                     last_contact_client(client_id)
@@ -134,7 +158,11 @@ def update_client(token):
         else:
             view_not_authorized(client)
 
+
 def wich_client():
+    """
+    Renvoie une liste de clients dont le nom correspond à celui spécifié.
+    """
     found = False
     clients_corresponding = None
     client_name = view_wich_client(clients_corresponding, found)

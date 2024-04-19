@@ -30,6 +30,9 @@ def generate_token(collaborator_id, department_id):
 
 
 def authenticate(email, password):
+    """
+    Fonction pour vérifier l'authentification
+    """
     collaborator = session.query(Collaborator).filter_by(email=email).first()
 
     if collaborator:
@@ -49,6 +52,9 @@ def authenticate(email, password):
 
 
 def authorize(token):
+    """
+    Fonction pour vérifier l'autorisation
+    """
     try:
         # Vérifier la validité et l'intégrité du token
         payload = jwt.decode(token, secret_key, algorithms=['HS256'])
@@ -76,7 +82,12 @@ def authorize(token):
     except jwt.InvalidTokenError:
         return False
 
+
 def verify_department(token, department_id):
+    """
+    Fonction pour vérifier que l'utilisateur fait bien partie du département demandé.
+    True si l'utilisateur fait partie du département demandé, False sinon
+    """
     try:
         payload = jwt.decode(token, secret_key, algorithms=['HS256'])
         user_department_id = payload['department_id']
@@ -88,9 +99,12 @@ def verify_department(token, department_id):
 
     except jwt.InvalidTokenError:
         return False
-    
+
 
 def refresh_token(old_token):
+    """
+    Fonction pour rafraîchir un token expiré.
+    """
     try:
         # Décoder l'ancien token pour récupérer l'ID du collaborateur et l'ID du département
         payload = jwt.decode(old_token, secret_key, algorithms=['HS256'])
