@@ -176,6 +176,5 @@ def view_delete_collaborator(collaborator, deleted):
 
 
 def view_not_authorized(client):
-    click.echo(f'Seul le commercial du client {
-               client.full_name} est autorisé à utiliser cette fonctionnalité')
+    click.echo(f'Seul le commercial du client {client.full_name} est autorisé à utiliser cette fonctionnalité')
     return None

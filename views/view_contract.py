@@ -176,8 +176,7 @@ def view_delete_contract(contract, client, deleted, events):
         click.echo(
             'Un événement est associé à ce contrat, vous ne pouvez pas le supprimer actuellement')
     else:
-        click.echo(f'Suppresion du contrat de {client.full_name}, 
-                   d\'un montant de {contract.total_amount}')
+        click.echo(f'Suppresion du contrat de {client.full_name}, d\'un montant de {contract.total_amount}')
         response = click.prompt('Souhaitez-vous supprimer ce contrat ? (O/N)')
         if response.upper() == 'O':
             return True

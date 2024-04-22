@@ -7,15 +7,17 @@ def view_wich_collaborator_in_department(collaborators_corresponding, department
     """
     if found:
         collaborator_found = None
+
         if collaborators_corresponding:
             if len(collaborators_corresponding) == 1:
 
-                click.echo(f'Un collaborateur correspondant {
-                           collaborators_corresponding[0].full_name}')
+                click.echo(f'Un collaborateur correspondant {collaborators_corresponding[0].full_name}')
                 response = click.prompt(
                     'Selectionner ce collaborateur ? (O/N) ')
                 if response.upper() == 'O':
                     collaborator_found = collaborators_corresponding[0]
+                else:
+                    return None
             else:
                 click.echo("Plusieurs collaborateurs correspondent à ce nom :")
                 for idx, collaborator in enumerate(collaborators_corresponding, start=1):
@@ -43,4 +45,4 @@ def view_wich_collaborator_in_department(collaborators_corresponding, department
         collaborator_name = click.prompt(
             "Entrez le nom du collaborateur: ", type=str)
         if collaborator_name:
-            return collaborator_name
+            return collaborator_name 

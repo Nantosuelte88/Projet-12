@@ -14,6 +14,8 @@ class CollaboratorDAO:
         return collaborators
 
     def get_collaborator(self, collaborator_id):
+        if collaborator_id is None:
+            return None
         collaborator = self.session.query(Collaborator).get(collaborator_id)
         return collaborator
 

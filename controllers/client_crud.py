@@ -102,10 +102,6 @@ def create_new_client(token):
         last_contact_date = None
         commercial_id = get_id_by_token(token)
         company_name = info_client[3]
-        company_id = None
-
-        if company_name and info_client[4]:
-            company_id = info_client[4]
 
         # Création d'une instance du client avec les valeurs spécifiées
         new_client_data = {
@@ -116,7 +112,6 @@ def create_new_client(token):
             'last_contact_date': last_contact_date,
             'commercial_id': commercial_id,
             'company_name': company_name,
-            'company_id': company_id
         }
 
         # Appel à la méthode create_client du DAO pour créer le client
@@ -140,17 +135,7 @@ def update_client(token):
             client_id = client.id
             response = view_update_client(client, modified)
             if response:
-                if response.get("company_id"):
-                    company_id = {'company_id': response.get("company_id")}
-                    company_name = {
-                        'company_name': response.get("company_name")}
-                    modified_client = client_dao.update_client(
-                        client_id, company_name)
-                    modified_client = client_dao.update_client(
-                        client_id, company_id)
-                else:
-                    modified_client = client_dao.update_client(
-                        client_id, response)
+                modified_client = client_dao.update_client(client_id, response)
                 if modified_client:
                     modified = True
                     last_contact_client(client_id)
@@ -168,8 +153,9 @@ def wich_client():
     client_name = view_wich_client(clients_corresponding, found)
     if client_name:
         clients_corresponding = client_dao.get_clients_by_name(client_name)
-        if clients_corresponding:
-            found = True
-            client = view_wich_client(clients_corresponding, found)
-            if client:
-                return client
+        found = True
+        client = view_wich_client(clients_corresponding, found)
+        if client:
+            return client
+        else:
+            return None

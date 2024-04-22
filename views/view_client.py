@@ -63,19 +63,11 @@ def view_create_client(created):
         if response.upper() == 'O':
             company_name = click.prompt('Nom de l\'entreprise', type=str)
             while not all(c.isalnum() or c.isspace() for c in company_name):
-                click.echo(
-                    "Le nom de l'entreprise ne doit contenir que des chiffres, des lettres et des espaces.")
+                click.echo("Le nom de l'entreprise ne doit contenir que des chiffres, des lettres et des espaces.")
                 company_name = click.prompt('Nom de l\'entreprise', type=str)
-            company_name, company_id = wich_company(company_name)
-            if company_id is not None:
-                click.echo("Le client sera créé avec l'entreprise associée")
-                new_client.extend(
-                    [full_name, email, phone_number, company_name, company_id])
-            else:
-                click.echo(
-                    "Le client sera créé sans entreprise associée gkdfjgkvjfdc")
-                new_client.extend(
-                    [full_name, email, phone_number, company_name, None])
+
+            new_client.extend([full_name, email, phone_number, company_name])
+
         else:
             click.echo("Le client sera créé sans entreprise associée")
             new_client.extend([full_name, email, phone_number, None, None])
@@ -134,8 +126,7 @@ def view_update_client(client, modified):
             click.echo(f"1: Son nom complet : {client.full_name}")
             click.echo(f"2: Son email : {client.email}")
             click.echo(f"3: Son numéro de téléphone : {client.phone_number}")
-            click.echo(f"4: Son entreprise : {
-                       client.company or 'Actuellement vide'}")
+            click.echo(f"4: Son entreprise : {client.company_name or 'Actuellement vide'}")
 
             choice = click.prompt(
                 "Entrez le numéro correspondant à votre choix: ", type=int)
@@ -166,31 +157,9 @@ def view_update_client(client, modified):
                 client_data = {"phone_number": new_phone_number}
 
             elif choice == 4:
-                response = click.prompt(
-                    'Voulez-vous entrer un nom d\'entreprise? (O/N)', type=str)
-                if response.upper() == 'O':
-                    new_company_name = click.prompt(
-                        "Entrez le nom de la nouvelle entreprise: ")
-                    while not all(c.isalnum() or c.isspace() for c in new_company_name):
-                        click.echo(
-                            "Le nom de l'entreprise ne doit contenir que des chiffres, des lettres et des espaces.")
-                        new_company_name = click.prompt(
-                            'Nom de l\'entreprise', type=str)
-                    new_company_name, new_company_id = wich_company(
-                        new_company_name)
-                    if new_company_id is not None:
-                        click.echo(
-                            "Le client sera associé à la nouvelle entreprise")
-                        client_data = {
-                            "company_name": new_company_name, "company_id": new_company_id}
-                    else:
-                        click.echo(
-                            "Le client sera créé sans entreprise associée")
-                        client_data = {
-                            "company_name": new_company_name, "company_id": None}
-                else:
-                    click.echo("Le client sera créé sans entreprise associée")
-                    client_data = {"company_name": None, "company_id": None}
+                new_company_name = click.prompt(
+                    "Entrez le nom de la nouvelle entreprise: ", type=str)
+                client_data = {"company_name": new_company_name}
 
             else:
                 click.echo("Choix invalide.")

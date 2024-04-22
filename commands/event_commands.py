@@ -1,6 +1,6 @@
 import click
 from controllers.auth_permissions import authorize
-from controllers.event_crud import display_all_events, display_event_without_support, display_my_events, create_event, update_event, delete_event
+from controllers.event_crud import display_all_events, display_event_without_support, display_my_events, create_event, update_event, delete_event, update_support_in_event
 
 
 @click.group()
@@ -43,6 +43,17 @@ def update_event_command(ctx):
         return
     update_event(token)
 
+
+@event_commands.command()
+@click.pass_context
+def update_support_in_event_command(ctx):
+    token = ctx.obj["token"]
+
+    if token is None or not authorize(token):
+        click.echo(
+            "Veuillez vous connecter en utilisant la commande 'login' avant de modifier un événement.")
+        return
+    update_support_in_event(token)
 
 @event_commands.command()
 @click.pass_context

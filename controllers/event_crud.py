@@ -164,7 +164,7 @@ def update_event(token):
                         event, client.full_name, modified)
                     if new_data:
                         if 'client_id' in new_data:
-                            client_id = new_data['client_id']
+                            client_id = new_data['client_id'] 
                             modification = contract_dao.update_contract(
                                 event.contract_id, new_data)
                         else:
@@ -190,6 +190,8 @@ def update_support_in_event(token):
     modified = False
     if event:
         support = collaborator_dao.get_collaborator(event.support_id)
+        if support is None:
+            support = None
         new_data = view_update_support_in_event(event, support, modified)
         if new_data:
             modification = event_dao.update_event(event.id, new_data)
@@ -228,8 +230,9 @@ def get_events_by_client(client):
         events = []
         if contracts:
             for contract in contracts:
-                event = event_dao.get_event_by_contract_id(contract.id).all()
-                events.extend(event)
+                event = event_dao.get_event_by_contract_id(contract.id)
+                if event:
+                    events.append(event)
         return events
 
 
@@ -237,6 +240,7 @@ def wich_event():
     """
     Sélectionne un événement en fonction de critères spécifiés par l'utilisateur.
     """
+    events = None
     response = view_search_event_by_name_or_client()
     if response:
         if 'client_name' in response:
@@ -248,9 +252,10 @@ def wich_event():
             if event_name:
                 events = event_dao.get_events_by_name(event_name)
 
-        event = view_wich_event(events)
-        if event:
-            return event
+        if events:
+            event = view_wich_event(events)
+            if event:
+                return event
 
     else:
         return None

@@ -16,13 +16,14 @@ def wich_collaborator_in_department(department_id):
     """
     found = False
     collaborators_corresponding = None
-    collaborator_name = view_wich_collaborator_in_department(
-        collaborators_corresponding, department_id, found)
+    collaborator_name = view_wich_collaborator_in_department(collaborators_corresponding, department_id, found)
     if collaborator_name:
-        collaborators_corresponding = collaborator_dao.get_corresponding_collaborator(
-            collaborator_name)
-        if collaborators_corresponding:
-            collaborator = view_wich_collaborator_in_department(
-                collaborators_corresponding, department_id, found)
-            if collaborator:
-                return collaborator
+        collaborators_corresponding = collaborator_dao.get_corresponding_collaborator(collaborator_name)
+        found = True
+        collaborator = view_wich_collaborator_in_department(collaborators_corresponding, department_id, found)
+        if collaborator:
+            return collaborator
+        else:
+            return None
+    else:
+        return None 
