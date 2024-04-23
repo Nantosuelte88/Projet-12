@@ -1,3 +1,5 @@
+import logging
+from sentry_sdk import capture_message
 from connect_database import create_db_connection
 from DAO.collaborator_dao import CollaboratorDAO
 from DAO.department_dao import DepartmentDAO
@@ -5,6 +7,7 @@ import bcrypt
 from views.view_collaborator import view_create_collaborator, view_update_collaborator, view_wich_collaborator, view_delete_collaborator
 from utils.decorators import permission_for_gestion_department
 
+logger = logging.getLogger(__name__)
 
 session = create_db_connection()
 collaborator_dao = CollaboratorDAO(session)
@@ -36,6 +39,9 @@ def create_collaborator(token):
 
         if new_collaborator:
             created = True
+            message = f"Collaborator created: {new_collaborator.full_name}, {new_collaborator.email}"
+            logger.info(message)
+            capture_message(message)
             view_create_collaborator(created, departments)
 
 
@@ -56,6 +62,14 @@ def update_collaborator(token):
                 collaborator.id, new_data)
             if modification:
                 modified = True
+                message = f"Collaborator modified: {collaborator.full_name} ("
+                if 'full_name' in new_data:
+                    message += f"{new_data['full_name']} -> {collaborator.full_name}"
+                else:
+                    message += collaborator.full_name
+                message += ")"
+                logger.info(message)
+                capture_message(message)
                 view_update_collaborator(
                     collaborator, modified, departments, department)
 

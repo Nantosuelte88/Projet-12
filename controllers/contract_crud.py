@@ -1,4 +1,5 @@
-
+import logging
+from sentry_sdk import capture_message
 from connect_database import create_db_connection
 from datetime import datetime, timezone
 from DAO.client_dao import ClientDAO
@@ -10,6 +11,10 @@ from views.view_collaborator import view_not_authorized
 from controllers.client_crud import last_contact_client, wich_client
 from utils.decorators import permission_commercial_or_gestion, permission_for_gestion_department, permission_for_commercial_department, COMMERCIAL
 from utils.get_object import get_id_by_token
+
+
+logger = logging.getLogger(__name__)
+
 
 session = create_db_connection()
 client_dao = ClientDAO(session)
@@ -89,6 +94,12 @@ def create_contract(token):
                 view_create_contract(client, created)
                 last_contact_client(client.id)
 
+                # Si le contrat est signé -> message dans Sentry
+                if info_contract[2]:
+                    message = f"A new contract for {client.full_name} has been created and signed"
+                    logger.info(message)
+                    capture_message(message)
+
 
 @permission_commercial_or_gestion()
 def update_contract(token):
@@ -130,6 +141,12 @@ def update_contract(token):
                         view_update_contract(contract, client, modified)
                         last_contact_client(client_id)
 
+                        # Si le contrat est signé -> message dans Sentry
+                        if 'status' in new_data:
+                            if new_data['status']:
+                                message = f"Contract n°{contract.id} has been signed"
+                                logger.info(message)
+                                capture_message(message)
 
 @permission_for_gestion_department()
 def delete_contract(token):
