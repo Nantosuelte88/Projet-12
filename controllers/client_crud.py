@@ -24,8 +24,8 @@ def display_all_clients(token):
     Affiche tous les clients de la base de données.
     """
     clients = client_dao.get_all_clients()
+    collaborators = []
     if clients:
-        collaborators = []
         for client in clients:
             if client.commercial_id:
                 collaborator = collaborator_dao.get_collaborator(
@@ -65,6 +65,7 @@ def delete_client(token):
     client = wich_client()
     if client:
         user_id = get_id_by_token(token)
+        # On vérifie que le commercial est bien celui affilié au client
         if client.commercial_id == user_id:
             deleted = False
             contracts_clients = contract_dao.get_contracts_by_client_id(
@@ -100,6 +101,8 @@ def create_new_client(token):
     if info_client:
         creation_date = datetime.now(timezone.utc)
         last_contact_date = None
+
+        # On prend l'id du commercial connecté pour le mettre en "commercial_id"
         commercial_id = get_id_by_token(token)
         company_name = info_client[3]
 
@@ -131,6 +134,7 @@ def update_client(token):
     client = wich_client()
     if client:
         user_id = get_id_by_token(token)
+        # On vérifie que le commercial est bien celui affilié au client
         if client.commercial_id == user_id:
             client_id = client.id
             response = view_update_client(client, modified)

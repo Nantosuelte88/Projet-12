@@ -36,8 +36,7 @@ def view_create_contract(client, created):
         click.echo('Nouveau contrat enregistré avec succès')
     else:
 
-        click.echo(f"Création d\'un nouveau contrat pour le client {
-                   client.full_name}")
+        click.echo(f"Création d\'un nouveau contrat pour le client {client.full_name}")
 
         new_contract = []
 

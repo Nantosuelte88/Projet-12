@@ -13,7 +13,7 @@ def is_valid_password(password):
     """
     Vérifie si le mot de passe est valide
     """
-    # revoir le mot de passe
+    # Personnaliser la création du mot de passe
     if len(password) < 10:
         return False
 
@@ -24,6 +24,7 @@ def is_valid_phone_number(phone_number):
     """
     Vérifie si le numéro de téléphone est valide
     """
+    # Personnaliser les numéros de téléphone, ajustez selon les pays des clients etc
     pattern = r'^[\d\s+]+$'
     if len(phone_number) > 10:
         return False

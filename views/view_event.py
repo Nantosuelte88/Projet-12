@@ -87,7 +87,7 @@ def view_create_event(client, contract, created):
             location = click.prompt('Le lieu de l\'événement', type=str)
         new_event.append(location)
 
-        attendees = click.prompt('Nombre de convives attendues', type=int)
+        attendees = click.prompt('Nombre de convives attendu', type=int)
         new_event.append(attendees)
 
         notes = click.prompt('Commentaire ', type=str)
@@ -153,7 +153,7 @@ def view_wich_event(events):
             selected_event = events[selected_id - 1]
             return selected_event
         else:
-            click.echo("Numéro d\événement invalide.")
+            click.echo("Numéro d'événement invalide.")
             return None
     else:
         click.echo("Aucun événement trouvé pour ce client")
@@ -168,7 +168,7 @@ def view_update_support_in_event(event, support, modified):
         click.echo("Evenement modifié avec succès")
     else:
         if support:
-            click.echo(f"Modifcation du collaborateur {support.full_name} pour l'événement ~ {event.name} ~ ")
+            click.echo(f"Modification du collaborateur {support.full_name} pour l'événement ~ {event.name} ~ ")
         else:
             click.echo(f"Ajout d'un collaborateur pour l'événement ~ {event.name} ~ ")
 
@@ -194,8 +194,8 @@ def view_update_event(event, client_name, modified):
         click.echo(f"1: Le nom : {event.name}")
         click.echo(f"2: La date de début : {event.date_start}")
         click.echo(f"3: La date de fin : {event.date_end}")
-        click.echo(f"4: Le lieu de l\'événement : {event.location}")
-        click.echo(f"5: Le nombre de convives attendues : {event.attendees}")
+        click.echo(f"4: Le lieu de l'événement : {event.location}")
+        click.echo(f"5: Le nombre de convives attendu : {event.attendees}")
         click.echo(f"6: Les commentaires : {event.notes}")
         click.echo(f"7: Le client associé : {client_name}")
 
@@ -246,7 +246,7 @@ def view_update_event(event, client_name, modified):
 
         elif choice == 5:
             new_attendees = click.prompt(
-                'Entrez le nouveau nombre de convives attendues', type=int)
+                'Entrez le nouveau nombre de convives attendu', type=int)
             event_data = {'attendees': new_attendees}
 
         elif choice == 6:

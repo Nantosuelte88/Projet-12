@@ -4,7 +4,7 @@ from connect_database import create_db_connection
 from DAO.collaborator_dao import CollaboratorDAO
 from DAO.department_dao import DepartmentDAO
 import bcrypt
-from views.view_collaborator import view_create_collaborator, view_update_collaborator, view_wich_collaborator, view_delete_collaborator
+from views.view_collaborator import view_all_collaborators, view_create_collaborator, view_update_collaborator, view_wich_collaborator, view_delete_collaborator
 from utils.decorators import permission_for_gestion_department
 
 logger = logging.getLogger(__name__)
@@ -14,8 +14,23 @@ collaborator_dao = CollaboratorDAO(session)
 department_dao = DepartmentDAO(session)
 
 
+def display_all_collaborators(token):
+    """
+    Affiche tous les colaborateurs de la base de données.
+    """
+    collaborators = collaborator_dao.get_all_collaborators()
+    departments = []
+    if collaborators:
+        for collaborator in collaborators:
+            department_name = department_dao.get_department(collaborator.department_id)
+            if department_name:
+                departments.append(department_name)
+    
+    view_all_collaborators(collaborators, departments)
+
+
 @permission_for_gestion_department()
-def create_collaborator(token):
+def create_collaborator():
     """
     Crée un nouveau collaborateur si l'utilisateur fait partie du département gestion.
     """
@@ -39,6 +54,7 @@ def create_collaborator(token):
 
         if new_collaborator:
             created = True
+            # Message pour Sentry
             message = f"Collaborator created: {new_collaborator.full_name}, {new_collaborator.email}"
             logger.info(message)
             capture_message(message)
@@ -62,6 +78,8 @@ def update_collaborator(token):
                 collaborator.id, new_data)
             if modification:
                 modified = True
+
+                # Message pour Sentry
                 message = f"Collaborator modified: {collaborator.full_name} ("
                 if 'full_name' in new_data:
                     message += f"{new_data['full_name']} -> {collaborator.full_name}"
@@ -70,6 +88,8 @@ def update_collaborator(token):
                 message += ")"
                 logger.info(message)
                 capture_message(message)
+
+                # Envoie de la confirmation à la vue
                 view_update_collaborator(
                     collaborator, modified, departments, department)
 

@@ -1,5 +1,27 @@
 import click
+from tabulate import tabulate
 from utils.input_validators import is_valid_email, is_valid_password
+
+
+def view_all_collaborators(collaborators, departments):
+    """
+    Affiche les collaborateurs ainsi que leurs departements.
+    """
+    if collaborators:
+        table_data = []
+        for collaborator, department in zip(collaborators, departments):
+            row = [
+                collaborator.id,
+                collaborator.full_name,
+                collaborator.email,
+                department.name if department else "Departement inconnu"
+            ]
+            table_data.append(row)
+
+        headers = [" ", "Nom", "Email", "Departement"]
+        print(tabulate(table_data, headers, tablefmt="grid"))
+    else:
+        print("Aucun collaborateur à afficher.")
 
 
 def view_wich_collaborator(collaborators_corresponding, found):
@@ -69,19 +91,19 @@ def view_create_collaborator(created, departments):
             password = click.prompt('Mot de passe', hide_input=True, type=str)
             while not is_valid_password(password):
                 click.echo(
-                    'Veuillez entrer un mot de passe valide - A MODIFIER')
+                    'Veuillez entrer un mot de passe valide')
                 password = click.prompt('Mot de passe', type=str)
             new_collaborator.append(password)
 
-            click.echo('Choisissez un departement à associer :')
+            click.echo('Choisissez un département à associer :')
             for department in departments:
                 click.echo(f"{department.id}. {department.name}")
             selected_department = click.prompt(
-                "Sélectionner lu numéro de departement", type=int)
+                "Sélectionner lu numéro de département", type=int)
             while not selected_department <= 3:
                 click.echo('Veuillez selectionner un numéro valide.')
                 selected_department = click.prompt(
-                    "Sélectionner lu numéro de departement", type=int)
+                    "Sélectionner le numéro de département", type=int)
             new_collaborator.append(selected_department)
 
             return new_collaborator
@@ -136,15 +158,15 @@ def view_update_collaborator(collaborator, modified, departments, department):
 
             elif choice == 4:
                 if departments:
-                    click.echo('Choisissez un departement à associer :')
+                    click.echo('Choisissez un département à associer :')
                     for department in departments:
                         click.echo(f"{department.id}. {department.name}")
                     selected_department = click.prompt(
-                        "Sélectionner lu numéro de departement", type=int)
+                        "Sélectionner lu numéro de département", type=int)
                     while not selected_department <= 3:
                         click.echo('Veuillez selectionner un numéro valide.')
                         selected_department = click.prompt(
-                            "Sélectionner le numéro de departement", type=int)
+                            "Sélectionner le numéro de département", type=int)
                     collaborator_data = {'department_id': selected_department}
 
             else:

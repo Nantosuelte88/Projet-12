@@ -1,11 +1,23 @@
 import click
 from controllers.auth_permissions import authorize
-from controllers.collaborator_crud import create_collaborator, update_collaborator, delete_collaborator
+from controllers.collaborator_crud import create_collaborator, update_collaborator, delete_collaborator, display_all_collaborators
 
 
 @click.group()
 def collaborator_commands():
     pass
+
+
+@collaborator_commands.command()
+@click.pass_context
+def view_collaborators(ctx):
+    token = ctx.obj["token"]
+
+    if token is None or not authorize(token):
+        click.echo(
+            "Veuillez vous connecter en utilisant la commande 'login' avant d'afficher les collaborateurs.")
+        return
+    display_all_collaborators(token)
 
 
 @collaborator_commands.command()
@@ -17,7 +29,7 @@ def create_collaborator_command(ctx):
         click.echo(
             "Veuillez vous connecter en utilisant la commande 'login' avant de créer un collaborateur.")
         return
-    create_collaborator(token)
+    create_collaborator()
 
 
 @collaborator_commands.command()

@@ -1,6 +1,5 @@
 import os
 import jwt
-from sqlalchemy.orm import sessionmaker
 from datetime import datetime, timedelta, timezone
 from connect_database import create_db_connection
 from models.collaboration import Collaborator
@@ -36,7 +35,7 @@ def authenticate(email, password):
     collaborator = session.query(Collaborator).filter_by(email=email).first()
 
     if collaborator:
-        print('collaborateur trouvé :', collaborator.full_name)
+        print('Collaborateur :', collaborator.full_name)
         if bcrypt.checkpw(password.encode('utf-8'), collaborator.password.encode('utf-8')):
             # Le mot de passe est valide
             print('Authentification réussie')

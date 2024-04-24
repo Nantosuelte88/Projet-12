@@ -1,0 +1,15 @@
+# Information de connexion à la base de données
+DB_HOST=
+DB_PORT=
+DB_USER=
+DB_PASSWORD=
+DB_NAME=
+
+TOKEN_FILE_PATH = "token.txt"
+
+# lien Sentry
+DSN = 
+
+
+# utile si vous souhaitez effectuer des tests sur la connexion des collaborateurs
+TEST_PASSWORD=

@@ -70,7 +70,7 @@ def view_create_client(created):
 
         else:
             click.echo("Le client sera créé sans entreprise associée")
-            new_client.extend([full_name, email, phone_number, None, None])
+            new_client.extend([full_name, email, phone_number, None])
 
         return new_client
 
@@ -153,7 +153,6 @@ def view_update_client(client, modified):
                     click.echo('Veuillez entrer un numéro de téléphone valide')
                     new_phone_number = click.prompt(
                         "Entrez le nouveau numéro de téléphone: ")
-
                 client_data = {"phone_number": new_phone_number}
 
             elif choice == 4:

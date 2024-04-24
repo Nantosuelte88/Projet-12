@@ -109,15 +109,18 @@ def create_event(token):
         if contract_event:
             view_contract_has_event(contract, contract_event)
         else:
+            # On cherch le client d'après le client_id du contrat
             client_id = contract.client_id
             client = client_dao.get_client(client_id)
             if client:
                 if contract.status:
                     user_id = get_id_by_token(token)
+                    # On vérifie que le commercial est celui affilié au client
                     if client.commercial_id == user_id:
                         event_data = view_create_event(
                             client, contract, created)
-                        print(event_data)
+                        
+                        # On ajoute le support si l'utilisateur a souhaité en ajouter un
                         support = event_data[6]
                         if support:
                             support_id = support
@@ -143,6 +146,7 @@ def create_event(token):
                     else:
                         view_not_authorized(client)
                 else:
+                    # Si le contrat n'est pas signé on envoie une vue pour signifier qu'on ne peut pas créer d'événement
                     view_no_event_with_contract_unsigned(client, contract)
 
 
@@ -154,6 +158,7 @@ def update_event(token):
     event = wich_event()
     if event:
         user_id = get_id_by_token(token)
+        # On vérifie que le support est celui affilié à l'événement
         if event.support_id == user_id:
             contract = contract_dao.get_contract(event.contract_id)
             if contract:
@@ -162,11 +167,16 @@ def update_event(token):
                     modified = False
                     new_data = view_update_event(
                         event, client.full_name, modified)
+                    
                     if new_data:
+                        
+                        # Si la modification souhaité par l'utilisateur concerne le client -> on met à jour le contrat
                         if 'client_id' in new_data:
                             client_id = new_data['client_id'] 
                             modification = contract_dao.update_contract(
                                 event.contract_id, new_data)
+                        
+                        # Sinon on met à jour l'événement
                         else:
                             modification = event_dao.update_event(
                                 event.id, new_data)
@@ -178,6 +188,7 @@ def update_event(token):
                                 event, client.full_name, modified)
                             last_contact_client(client_id)
         else:
+            # Si ce n'est pas le bon support on envoie une vue pour signifier qu'on ne peut pas faire de modification
             view_no_event_update_for_wrong_support(event)
 
 
