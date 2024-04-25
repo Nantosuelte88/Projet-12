@@ -30,7 +30,7 @@ def display_all_collaborators(token):
 
 
 @permission_for_gestion_department()
-def create_collaborator():
+def create_collaborator(token):
     """
     Crée un nouveau collaborateur si l'utilisateur fait partie du département gestion.
     """

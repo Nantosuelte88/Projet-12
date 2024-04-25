@@ -29,7 +29,7 @@ def create_collaborator_command(ctx):
         click.echo(
             "Veuillez vous connecter en utilisant la commande 'login' avant de créer un collaborateur.")
         return
-    create_collaborator()
+    create_collaborator(token)
 
 
 @collaborator_commands.command()

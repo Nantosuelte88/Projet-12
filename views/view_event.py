@@ -47,7 +47,7 @@ def view_contract_has_event(contract, event):
 
 
 def view_no_event_update_for_wrong_support(event):
-    click.echo(f'Seul le collaborateur du départmeent Support affilié à l\'événement ~ {event.name} ~ peut avoir accès à cette fonctionnalité.')
+    click.echo(f'Seul le collaborateur du département Support affilié à l\'événement ~ {event.name} ~ peut avoir accès à cette fonctionnalité.')
 
 
 def view_create_event(client, contract, created):

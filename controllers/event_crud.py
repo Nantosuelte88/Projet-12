@@ -217,20 +217,21 @@ def delete_event(token):
     Supprime un événement.
     """
     event = wich_event()
-    contract = contract_dao.get_contract(event.contract_id)
-    if contract:
-        client = client_dao.get_client(contract.client_id)
-        if client:
-            if event:
-                deleted = False
-                response = view_delete_event(event, client, deleted)
-                if response:
-                    remove = event_dao.delete_event(event.id)
-                    if remove:
-                        deleted = True
-                        view_delete_event(event, client, deleted)
-                        last_contact_client(client.id)
-
+    if event:
+        contract = contract_dao.get_contract(event.contract_id)
+        if contract:
+            client = client_dao.get_client(contract.client_id)
+            if client:
+                if event:
+                    deleted = False
+                    response = view_delete_event(event, client, deleted)
+                    if response:
+                        remove = event_dao.delete_event(event.id)
+                        if remove:
+                            deleted = True
+                            view_delete_event(event, client, deleted)
+                            last_contact_client(client.id)
+        
 
 def get_events_by_client(client):
     """
@@ -245,6 +246,8 @@ def get_events_by_client(client):
                 if event:
                     events.append(event)
         return events
+    else:
+        return None
 
 
 def wich_event():
@@ -258,15 +261,21 @@ def wich_event():
             client = wich_client()
             if client:
                 events = get_events_by_client(client)
+            else:
+                return None
         elif 'name' in response:
             event_name = response['name']
             if event_name:
                 events = event_dao.get_events_by_name(event_name)
+            else:
+                return None
 
         if events:
             event = view_wich_event(events)
             if event:
                 return event
-
+        else:
+            return None
+        
     else:
         return None
